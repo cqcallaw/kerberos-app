@@ -34,7 +34,8 @@
 #ifndef KRBAPP_H
 #define KRBAPP_H
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <android/log.h>

@@ -34,7 +34,8 @@
 #ifndef _Included_edu_mit_kerberos_KerberosAppActivity
 #define _Included_edu_mit_kerberos_KerberosAppActivity
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 /*
  * Class:     edu_mit_kerberos_KerberosAppActivity
@@ -45,40 +46,40 @@ extern "C" {
  * ticket cache.
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeSetKRB5CCNAME
-  (JNIEnv* env, jobject obj, jstring argString);
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeSetKRB5CCNAME(
+        JNIEnv* env, jobject obj, jstring argString);
 
 /*
  * Class:     edu_mit_kerberos_KerberosAppActivity
  * Method:    nativeKinit
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKinit
-  (JNIEnv *, jobject, jstring, jint);
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKinit(
+        JNIEnv *, jobject, jstring, jint);
 
 /*
  * Class:     edu_mit_kerberos_KerberosAppActivity
  * Method:    nativeKlist
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKlist
-  (JNIEnv *, jobject, jstring, jint);
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKlist(
+        JNIEnv *, jobject, jstring, jint);
 
 /*
  * Class:     edu_mit_kerberos_KerberosAppActivity
  * Method:    nativeKvno
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKvno
-  (JNIEnv *, jobject, jstring, jint);
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKvno(
+        JNIEnv *, jobject, jstring, jint);
 
 /*
  * Class:     edu_mit_kerberos_KerberosAppActivity
  * Method:    nativeKdestroy
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKdestroy
-  (JNIEnv *, jobject, jstring, jint);
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKdestroy(
+        JNIEnv *, jobject, jstring, jint);
 
 #ifdef __cplusplus
 }
