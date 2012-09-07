@@ -49,16 +49,16 @@ extern jobject cached_obj;
 #define  LOG_TAG    "---KERBEROS---"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
-#define log(...)        androidPrint(__VA_ARGS__)
-#define com_err(progname, code, ...)    androidError(progname, code, __VA_ARGS__)
+#define log(...)        android_log(__VA_ARGS__)
+#define com_err(progname, code, ...)    android_log_error(progname, code, __VA_ARGS__)
 
 extern JNIEnv* GetJNIEnv(JavaVM *jvm);
 extern void generateArgv(char*, int, char**);
 extern void releaseArgv(int, char**);
 
-extern void androidPrint(const char*, ...);
-extern void androidError(const char*, errcode_t, const char*, ...);
-extern int appendText(char*);
+extern void android_log(const char*, ...);
+extern void android_log_error(const char*, errcode_t, const char*, ...);
+extern int android_log_message(char*);
 
 extern int kinit_driver(JNIEnv*, jobject, int, char**);
 extern int klist_driver(JNIEnv*, jobject, int, char**);

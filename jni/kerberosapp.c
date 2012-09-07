@@ -42,12 +42,12 @@ jobject cached_obj;
  * Note: argv begins with command name, and is
  *       NULL terminated (thus the +2)
  */
-void generateArgv(char* input, int argc, char** argv)
+void generate_argv(char* input, int argc, char** argv)
 {
     int i;
     char* tmp;
 
-    LOGI("Entered generateArgv");
+    LOGI("Entered generate_argv");
     for (i = 0; i < argc + 2; i++)
     {
         if (i == 0)
@@ -76,7 +76,7 @@ void generateArgv(char* input, int argc, char** argv)
 /*
  * Free argv array.
  */
-void releaseArgv(int argc, char** argv)
+void release_argv(int argc, char** argv)
 {
     int i;
 
@@ -200,13 +200,13 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKinit(
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generateArgv(args_copy, numArgs, argv);
+    generate_argv(args_copy, numArgs, argv);
 
     /* run kinit */
     ret = kinit_driver(env, obj, numArgs + 1, argv);
 
     free(args_copy);
-    releaseArgv(numArgs + 1, argv);
+    release_argv(numArgs + 1, argv);
 
     if (ret == 1)
         return 1;
@@ -245,13 +245,13 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKlist(
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generateArgv(args_copy, numArgs, argv);
+    generate_argv(args_copy, numArgs, argv);
 
     /* run kinit */
     ret = klist_driver(env, obj, numArgs + 1, argv);
 
     free(args_copy);
-    releaseArgv(numArgs + 1, argv);
+    release_argv(numArgs + 1, argv);
 
     if (ret == 1)
         return 1;
@@ -290,13 +290,13 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKvno(
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generateArgv(args_copy, numArgs, argv);
+    generate_argv(args_copy, numArgs, argv);
 
     /* run kinit */
     ret = kvno_driver(env, obj, numArgs + 1, argv);
 
     free(args_copy);
-    releaseArgv(numArgs + 1, argv);
+    release_argv(numArgs + 1, argv);
 
     if (ret == 1)
         return 1;
@@ -335,13 +335,13 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKdestroy(
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generateArgv(args_copy, numArgs, argv);
+    generate_argv(args_copy, numArgs, argv);
 
     /* run kdestroy */
     ret = kdestroy_driver(env, obj, numArgs + 1, argv);
 
     free(args_copy);
-    releaseArgv(numArgs + 1, argv);
+    release_argv(numArgs + 1, argv);
 
     if (ret == 1)
         return 1;
@@ -352,21 +352,22 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKdestroy(
  * Android log function, printf-style.
  * Logs input string to GUI TextView.
  */
-void androidPrint(const char* format, ...)
+void android_log(const char* format, ...)
 {
     va_list args;
     char appendString[4096];
 
     va_start(args, format);
     vsnprintf(appendString, sizeof(appendString), format, args);
-    appendText(appendString);
+    android_log(appendString);
     va_end(args);
 }
 
 /*
  * Android error log function, replaces com_err calls
  */
-void androidError(const char* progname, errcode_t code, const char* format, ...)
+void android_log_error(const char* progname, errcode_t code, const char* format,
+        ...)
 {
     va_list args;
     char errString[4096] = "Error ";
@@ -374,29 +375,29 @@ void androidError(const char* progname, errcode_t code, const char* format, ...)
     va_start(args, format);
     vsnprintf(errString + 6, sizeof(errString), format, args);
     strcat(errString, "\n");
-    appendText(errString);
+    android_log(errString);
     va_end(args);
 }
 
 /*
- * Appends text to Java TextView.
+ * Log a message to the Java environment by calling the method "log" on the Java object that invoked us.
  *
  * Note: Set jni_env, class_obj before calling.
  * Return: 0 (success), 1 (failure)
  */
-int appendText(char* input)
+int android_log_message(char* input)
 {
     JNIEnv* env;
-    jclass cls; /* edu.mit.kerberos.KerberosApp */
-    jmethodID mid; /* edu.mit.kerberos.KerberosApp.appendText() */
-    jstring javaOutput; /* text to append */
+    jclass cls;
+    jmethodID mid;
+    jstring javaOutput;
 
     env = GetJNIEnv(cached_jvm);
     cls = (*env)->GetObjectClass(env, cached_obj);
-    mid = (*env)->GetMethodID(env, cls, "appendText", "(Ljava/lang/String;)V");
+    mid = (*env)->GetMethodID(env, cls, "log", "(Ljava/lang/String;)V");
     if (mid == 0)
     {
-        LOGI("Unable to find Java appendText method");
+        LOGI("Unable to find Java log method");
         return 1;
     }
     else
@@ -412,4 +413,3 @@ int appendText(char* input)
     }
     return 0;
 }
-
