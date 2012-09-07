@@ -53,8 +53,8 @@ extern jobject cached_obj;
 #define com_err(progname, code, ...)    android_log_error(progname, code, __VA_ARGS__)
 
 extern JNIEnv* GetJNIEnv(JavaVM *jvm);
-extern void generateArgv(char*, int, char**);
-extern void releaseArgv(int, char**);
+extern void generate_argv(char*, int, char**);
+extern void release_argv(int, char**);
 
 extern void android_log(const char*, ...);
 extern void android_log_error(const char*, errcode_t, const char*, ...);
