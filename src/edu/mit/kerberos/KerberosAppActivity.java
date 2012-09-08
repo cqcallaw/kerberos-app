@@ -83,8 +83,6 @@ public class KerberosAppActivity extends Activity implements
 	static String serviceName = "service@myhost.local";
 	static int uid;
 
-	static Boolean passwordAuthentication = false;
-
 	/**
 	 * Button listener for kinit ("Get Ticket") button.
 	 */
@@ -111,14 +109,19 @@ public class KerberosAppActivity extends Activity implements
 						+ " " + prinValue;
 			}
 
-			int t = nativeKinit(argString, countWords(argString));
+			try {
+				int t = nativeKinit(argString, countWords(argString));
 
-			Log.i("---JAVA JNI---", "Return value from native lib: " + t);
+				Log.i("---JAVA JNI---", "Return value from native lib: " + t);
 
-			if (t == 0) {
-				tv.append("Got Ticket!\n");
-			} else if (t == 1)
-				tv.append("Failed to get Ticket!\n");
+				if (t == 0) {
+					tv.append("Got Ticket!\n");
+				} else if (t == 1) {
+					tv.append("Failed to get Ticket!\n");
+				}
+			} catch (Error e) {
+				log(e.getMessage());
+			}
 		}
 	};
 
@@ -129,7 +132,7 @@ public class KerberosAppActivity extends Activity implements
 		// blithely ignore prompts and multi-prompt scenarios, which a Real
 		// Implementation would need to handle.
 		if (prompts.length > 1) {
-			appendText("ERROR: Multi-prompt support not implemented!");
+			log("ERROR: Multi-prompt support not implemented!");
 			return results;
 		}
 
@@ -153,11 +156,15 @@ public class KerberosAppActivity extends Activity implements
 
 			String argString = "-c /data/local/kerberos/ccache/krb5cc_" + uid;
 
-			int t = nativeKlist(argString, countWords(argString));
-			Log.i("---JAVA JNI---", "Return value from native lib: " + t);
+			try {
+				int t = nativeKlist(argString, countWords(argString));
+				Log.i("---JAVA JNI---", "Return value from native lib: " + t);
 
-			if (t == 1)
-				tv.append("Failed to find Ticket!\n");
+				if (t == 1)
+					tv.append("Failed to find Ticket!\n");
+			} catch (Error e) {
+				log(e.getMessage());
+			}
 		}
 	};
 
@@ -175,14 +182,19 @@ public class KerberosAppActivity extends Activity implements
 			/* Clear TextView */
 			tv.setText("");
 
-			String argString = "-c /data/local/kerberos/ccache/krb5cc_" + uid
-					+ " -k /data/local/kerberos/krb5.keytab " + prinValue;
+			try {
+				String argString = "-c /data/local/kerberos/ccache/krb5cc_"
+						+ uid + " -k /data/local/kerberos/krb5.keytab "
+						+ prinValue;
 
-			int t = nativeKvno(argString, countWords(argString));
-			Log.i("---JAVA JNI---", "Return value from native lib: " + t);
+				int t = nativeKvno(argString, countWords(argString));
+				Log.i("---JAVA JNI---", "Return value from native lib: " + t);
 
-			if (t == 0)
-				tv.append("Finished!\n");
+				if (t == 0)
+					tv.append("Finished!\n");
+			} catch (Error e) {
+				log(e.getMessage());
+			}
 		}
 	};
 
@@ -200,11 +212,15 @@ public class KerberosAppActivity extends Activity implements
 
 			String argString = "-c /data/local/kerberos/ccache/krb5cc_" + uid;
 
-			int t = nativeKdestroy(argString, countWords(argString));
-			Log.i("---JAVA JNI---", "Return value from native lib: " + t);
+			try {
+				int t = nativeKdestroy(argString, countWords(argString));
+				Log.i("---JAVA JNI---", "Return value from native lib: " + t);
 
-			if (t == 0)
-				tv.append("Finished!\n");
+				if (t == 0)
+					tv.append("Finished!\n");
+			} catch (Error e) {
+				log(e.getMessage());
+			}
 		}
 	};
 
@@ -311,7 +327,7 @@ public class KerberosAppActivity extends Activity implements
 	 * 
 	 * @param input
 	 */
-	private void appendText(String input) {
+	private void log(String input) {
 		TextView tv = (TextView) findViewById(R.id.textView);
 		tv.append(input);
 	}
