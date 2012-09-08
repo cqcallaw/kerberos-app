@@ -65,6 +65,13 @@ extern int klist_driver(JNIEnv*, jobject, int, char**);
 extern int kvno_driver(JNIEnv*, jobject, int, char**);
 extern int kdestroy_driver(JNIEnv*, jobject, int, char**);
 
+int validate_caller(JNIEnv* env, jobject object);
+
+#define LOG_METHOD_NAME "log"
+#define LOG_METHOD_SIGNATURE "(Ljava/lang/String;)V"
+#define KINIT_PROMPTER_METHOD_NAME "kinitPrompter"
+#define KINIT_PROMPTER_METHOD_SIGNATURE "(Ljava/lang/String;Ljava/lang/String;[Ledu/mit/kerberos/Prompt;)[Ljava/lang/String;"
+
 #ifdef __cplusplus
 }
 #endif

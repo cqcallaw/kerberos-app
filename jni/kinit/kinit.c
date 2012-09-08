@@ -643,9 +643,7 @@ kinit_prompter(
 
     calling_class = (*jni_env)->GetObjectClass(jni_env, class_obj);
     prompter_method_id =
-    (*jni_env)->GetMethodID(jni_env, calling_class, "kinitPrompter",
-            "(Ljava/lang/String;Ljava/lang/String;[Ledu/mit/kerberos/Prompt;)[Ljava/lang/String;");
-
+    (*jni_env)->GetMethodID(jni_env, calling_class, KINIT_PROMPTER_METHOD_NAME, KINIT_PROMPTER_METHOD_SIGNATURE);
     //make the call
     result_array = (*jni_env)->CallObjectMethod(jni_env, class_obj, prompter_method_id,
             name_string, banner_string, prompt_array);

@@ -89,6 +89,33 @@ void release_argv(int argc, char** argv)
 }
 
 /*
+ * Make sure the required methods exist on the calling Java object.
+ * This function should be called early, when we have complete control over the flow of logic.
+ */
+int validate_caller(JNIEnv* env, jobject object)
+{
+    jclass class;
+    jthrowable exception;
+
+    class = (*env)->GetObjectClass(env, object);
+    (*env)->GetMethodID(env, class, LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
+    exception = (*env)->ExceptionOccurred(env);
+
+    if (exception)
+        return 1;
+
+    class = (*env)->GetObjectClass(env, object);
+    (*env)->GetMethodID(env, class, KINIT_PROMPTER_METHOD_NAME,
+            KINIT_PROMPTER_METHOD_SIGNATURE);
+    exception = (*env)->ExceptionOccurred(env);
+
+    if (exception)
+        return 1;
+
+    return 0;
+}
+
+/*
  * Get the current JNIEnv pointer from global JavaVM.
  */
 JNIEnv* GetJNIEnv(JavaVM *jvm)
@@ -189,6 +216,9 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKinit(
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
 
+    if (validate_caller(env, obj))
+        return 1;
+
     /* get original argv string from Java */
     args = (*env)->GetStringUTFChars(env, argString, &isCopy);
 
@@ -233,6 +263,9 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKlist(
 
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
+
+    if (validate_caller(env, obj))
+        return 1;
 
     /* get original argv string from Java */
     args = (*env)->GetStringUTFChars(env, argString, &isCopy);
@@ -279,6 +312,9 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKvno(
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
 
+    if (validate_caller(env, obj))
+        return 1;
+
     /* get original argv string from Java */
     args = (*env)->GetStringUTFChars(env, argString, &isCopy);
 
@@ -323,6 +359,9 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKdestroy(
 
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
+
+    if (validate_caller(env, obj))
+        return 1;
 
     /* get original argv string from Java */
     args = (*env)->GetStringUTFChars(env, argString, &isCopy);
@@ -380,7 +419,7 @@ void android_log_error(const char* progname, errcode_t code, const char* format,
 }
 
 /*
- * Log a message to the Java environment by calling the method "log" on the Java object that invoked us.
+ * Log a message to the Java environment
  *
  * Note: Set jni_env, class_obj before calling.
  * Return: 0 (success), 1 (failure)
@@ -394,22 +433,19 @@ int android_log_message(char* input)
 
     env = GetJNIEnv(cached_jvm);
     cls = (*env)->GetObjectClass(env, cached_obj);
-    mid = (*env)->GetMethodID(env, cls, "log", "(Ljava/lang/String;)V");
-    if (mid == 0)
+    mid = (*env)->GetMethodID(env, cls, LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
+
+    // doing exception checking here does no good since the VM will terminate
+    // if other functions are called after the exception occurs.
+    // We can't control the behavior of functions that call this function,
+    // so we need to do the error checking up-front.
+    javaOutput = (*env)->NewStringUTF(env, input);
+    if (env == NULL || cached_obj == NULL || mid == NULL || javaOutput == NULL)
     {
-        LOGI("Unable to find Java log method");
+        LOGI("Null variable in android_log_message input.");
         return 1;
     }
-    else
-    {
-        javaOutput = (*env)->NewStringUTF(env, input);
-        if (env == NULL || cached_obj == NULL || mid == NULL
-                || javaOutput == NULL)
-        {
-            LOGI("We have a null variable in native code");
-            return 1;
-        }
-        (*env)->CallVoidMethod(env, cached_obj, mid, javaOutput);
-    }
+    (*env)->CallVoidMethod(env, cached_obj, mid, javaOutput);
+
     return 0;
 }
