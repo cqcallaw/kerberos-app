@@ -359,7 +359,7 @@ void android_log(const char* format, ...)
 
     va_start(args, format);
     vsnprintf(appendString, sizeof(appendString), format, args);
-    android_log(appendString);
+    android_log_message(appendString);
     va_end(args);
 }
 
@@ -375,7 +375,7 @@ void android_log_error(const char* progname, errcode_t code, const char* format,
     va_start(args, format);
     vsnprintf(errString + 6, sizeof(errString), format, args);
     strcat(errString, "\n");
-    android_log(errString);
+    android_log_message(errString);
     va_end(args);
 }
 
