@@ -637,7 +637,7 @@ kinit_prompter(krb5_context ctx, void *data, const char *name,
     jstring name_string;
     jstring banner_string;
     jstring prompt_text;
-    jboolean is_hidden;
+    jboolean echo_on;
 
     jobjectArray prompt_array;
     jclass prompt_class;
@@ -656,22 +656,23 @@ kinit_prompter(krb5_context ctx, void *data, const char *name,
     name_string = (*jni_env)->NewStringUTF(jni_env, name);
     banner_string = (*jni_env)->NewStringUTF(jni_env, banner);
 
-    prompt_class = (*jni_env)->FindClass(jni_env, "edu/mit/kerberos/Prompt");
+    prompt_class = (*jni_env)->FindClass(jni_env, "javax/security/auth/callback/PasswordCallback");
     prompt_constructor_id = (*jni_env)->GetMethodID(jni_env, prompt_class, "<init>", "(Ljava/lang/String;Z)V");
     prompt_array = (*jni_env)->NewObjectArray(jni_env, num_prompts, prompt_class, NULL);
 
     for(i = 0; i < num_prompts; i++)
     {
         prompt_text = (*jni_env)->NewStringUTF(jni_env, prompts[i].prompt);
-        is_hidden = (jboolean)prompts[i].hidden;
+        echo_on = (jboolean)(prompts[i].hidden == 0 ? 1 : 0); //take logical inverse of "hidden" value
 
-        prompt = (*jni_env)->NewObject(jni_env, prompt_class, prompt_constructor_id, prompt_text, is_hidden);
+        prompt = (*jni_env)->NewObject(jni_env, prompt_class, prompt_constructor_id, prompt_text, echo_on);
         (*jni_env)->SetObjectArrayElement(jni_env, prompt_array, i, prompt);
     }
 
     calling_class = (*jni_env)->GetObjectClass(jni_env, class_obj);
     prompter_method_id =
     (*jni_env)->GetMethodID(jni_env, calling_class, KINIT_PROMPTER_METHOD_NAME, KINIT_PROMPTER_METHOD_SIGNATURE);
+
     //make the call
     result_array = (*jni_env)->CallObjectMethod(jni_env, class_obj, prompter_method_id,
             name_string, banner_string, prompt_array);
@@ -997,8 +998,7 @@ char **argv;
         return 1;
     }
 
-}
-return 0;
+    return 0;
 }
 #endif /* ANDROID */
 

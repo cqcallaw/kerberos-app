@@ -70,7 +70,7 @@ int validate_caller(JNIEnv* env, jobject object);
 #define LOG_METHOD_NAME "log"
 #define LOG_METHOD_SIGNATURE "(Ljava/lang/String;)V"
 #define KINIT_PROMPTER_METHOD_NAME "kinitPrompter"
-#define KINIT_PROMPTER_METHOD_SIGNATURE "(Ljava/lang/String;Ljava/lang/String;[Ledu/mit/kerberos/Prompt;)[Ljava/lang/String;"
+#define KINIT_PROMPTER_METHOD_SIGNATURE "(Ljava/lang/String;Ljava/lang/String;[Ljavax/security/auth/callback/Callback;)[Ljava/lang/String;"
 
 #ifdef __cplusplus
 }

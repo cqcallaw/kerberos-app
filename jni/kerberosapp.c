@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "edu_mit_kerberos_KerberosAppActivity.h"
+#include "net_brainvitamins_kerberos_KerberosOperations.h"
 #include "kerberosapp.h"
 
 /* Global JNI Variables */
@@ -140,7 +140,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
     JNIEnv* env;
 
-    LOGI("Loaded libkerberosapp");
+    LOGI("Loaded Kerberos library");
 
     if ((*jvm)->GetEnv(jvm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
         return -1;
@@ -169,7 +169,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
 }
 
 /*
- * Class:     edu_mit_kerberos_KerberosAppActivity
+ * Class:     net_brainvitamins_kerberos_KerberosOperations
  * Method:    nativeSetKRB5CCNAME
  * Signature: (Ljava/lang/String)I
  *
@@ -177,7 +177,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
  * ticket cache.
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeSetKRB5CCNAME(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeSetKRB5CCNAME(
         JNIEnv* env, jobject obj, jstring argString)
 {
     jboolean isCopy;
@@ -196,14 +196,14 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeSetKRB5CC
 }
 
 /*
- * Class:     edu_mit_kerberos_KerberosAppActivity
+ * Class:     net_brainvitamins_kerberos_KerberosOperations
  * Method:    nativeKinit
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native kinit application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKinit(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKinit(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -244,14 +244,14 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKinit(
 }
 
 /*
- * Class:     edu_mit_kerberos_KerberosAppActivity
+ * Class:     net_brainvitamins_kerberos_KerberosOperations
  * Method:    nativeKlist
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native klist application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKlist(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKlist(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -292,14 +292,14 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKlist(
 }
 
 /*
- * Class:     edu_mit_kerberos_KerberosAppActivity
+ * Class:     net_brainvitamins_kerberos_KerberosOperations
  * Method:    nativeKvno
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native kvno application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKvno(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKvno(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -340,14 +340,14 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKvno(
 }
 
 /*
- * Class:     edu_mit_kerberos_KerberosAppActivity
+ * Class:     net_brainvitamins_kerberos_KerberosOperations
  * Method:    nativeKdestroy
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native kdestroy application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKdestroy(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKdestroy(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -389,7 +389,6 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosAppActivity_nativeKdestroy(
 
 /*
  * Android log function, printf-style.
- * Logs input string to GUI TextView.
  */
 void android_log(const char* format, ...)
 {
@@ -438,7 +437,7 @@ int android_log_message(char* input)
     // doing exception checking here does no good since the VM will terminate
     // if other functions are called after the exception occurs.
     // We can't control the behavior of functions that call this function,
-    // so we need to do the error checking up-front.
+    // so we need to do the error checking upstream (in validate_error)
     javaOutput = (*env)->NewStringUTF(env, input);
     if (env == NULL || cached_obj == NULL || mid == NULL || javaOutput == NULL)
     {
