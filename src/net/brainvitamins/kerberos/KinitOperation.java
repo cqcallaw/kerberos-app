@@ -1,5 +1,20 @@
 package net.brainvitamins.kerberos;
 
+/*
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -26,74 +41,100 @@ public class KinitOperation extends KerberosOperation implements
 
 	boolean callbacksProcessed = false;
 
-	protected final Handler promptHandler;
-
 	/**
 	 * Private constructor to maintain state
 	 * 
-	 * @param logMessageHandler
-	 * @param promptHandler
+	 * @param messageHandler
 	 */
-	private KinitOperation(Handler logMessageHandler, Handler promptHandler) {
-		super(logMessageHandler);
-		this.promptHandler = promptHandler;
+	private KinitOperation(Handler messageHandler) {
+		super(messageHandler);
 	}
 
-	public static void execute(String principalName, Handler logMessageHandler,
-			Handler promptHandler) {
+	public static void execute(String principalName, Handler messageHandler) {
 		execute(principalName, Utilities.getDefaultCredentialsCache(),
-				logMessageHandler, promptHandler);
+				messageHandler);
 	}
 
 	public static void execute(String principalName,
-			CredentialsCacheFile credentialsCache, Handler logMessageHandler,
-			Handler promptHandler) {
-		String kinitArguments = "-V -c " + credentialsCache.getAbsolutePath()
-				+ " " + principalName;
+			CredentialsCacheFile credentialsCache, Handler messageHandler) {
+
+		KinitOperation operation = new KinitOperation(messageHandler);
+
+		if (!credentialsCache.getParentFile().exists()) {
+			operation
+					.log("ERROR: Credentials cache directory does not exist.\n");
+			operation.messageHandler
+					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+			return;
+		}
 
 		try {
-			launchNativeKinit(kinitArguments, logMessageHandler, promptHandler);
+			String kinitArguments = "-V -c "
+					+ credentialsCache.getCanonicalPath() + " " + principalName;
+			launchNativeKinit(kinitArguments, operation);
 		} catch (Error e) {
-			Log.d(LOG_TAG, e.getMessage());
+			operation.log("ERROR: " + e.getMessage());
+			operation.messageHandler
+					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+		} catch (IOException io) {
+			operation.log("ERROR: " + io.getMessage());
+			operation.messageHandler
+					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
 		}
 	}
 
 	public static void execute(String principalName, KeytabFile keytab,
-			Handler logMessageHandler, Handler promptHandler) {
+			Handler logMessageHandler) {
 		execute(principalName, keytab, Utilities.getDefaultCredentialsCache(),
-				logMessageHandler, promptHandler);
+				logMessageHandler);
 	}
 
 	public static void execute(String principalName, KeytabFile keytab,
-			CredentialsCacheFile credentialsCache, Handler logMessageHandler,
-			Handler promptHandler) {
-		String kinitArguments = "-V -c " + credentialsCache.getAbsolutePath()
-				+ " -k -t " + keytab.getAbsolutePath() + " " + principalName;
+			CredentialsCacheFile credentialsCache, Handler messageHandler) {
+		KinitOperation operation = new KinitOperation(messageHandler);
+
+		// so much copy pasta...
+		if (!credentialsCache.getParentFile().exists()) {
+			operation
+					.log("ERROR: Credentials cache directory does not exist.\n");
+			operation.messageHandler
+					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+			return;
+		}
 
 		try {
-			launchNativeKinit(kinitArguments, logMessageHandler, promptHandler);
+			String kinitArguments = "-V -c "
+					+ credentialsCache.getCanonicalPath() + " -k -t "
+					+ keytab.getAbsolutePath() + " " + principalName;
+
+			launchNativeKinit(kinitArguments, operation);
 		} catch (Error e) {
-			Log.d(LOG_TAG, e.getMessage());
+			operation.log("ERROR: " + e.getMessage());
+			operation.messageHandler
+					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+		} catch (IOException io) {
+			operation.log("ERROR: " + io.getMessage());
+			operation.messageHandler
+					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
 		}
 	}
 
 	private static void launchNativeKinit(final String kinitArguments,
-			final Handler logMessageHandler, final Handler promptHandler) {
+			final KinitOperation operation) {
 		new Thread() {
 			public void run() {
 				if (kinitLock.tryLock()) {
 					Log.d(LOG_TAG, "Going native...");
 					try {
-						int authenticationResult = new KinitOperation(
-								logMessageHandler, promptHandler).nativeKinit(
+						int authenticationResult = operation.nativeKinit(
 								kinitArguments,
 								KerberosOperations.countWords(kinitArguments));
 
 						if (authenticationResult == 0) {
-							logMessageHandler
+							operation.messageHandler
 									.sendEmptyMessage(AUTHENTICATION_SUCCESS_MESSAGE);
 						} else {
-							logMessageHandler
+							operation.messageHandler
 									.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
 						}
 						kinitLock.unlock();
@@ -118,10 +159,10 @@ public class KinitOperation extends KerberosOperation implements
 		KerberosCallbackArray callbackArray = new KerberosCallbackArray(
 				callbacks, this);
 
-		Message promptMessage = Message.obtain(promptHandler,
-				GET_CREDENTIALS_MESSAGE, callbackArray);
+		Message promptMessage = Message.obtain(messageHandler, PROMPTS_MESSAGE,
+				callbackArray);
 
-		promptHandler.sendMessage(promptMessage);
+		messageHandler.sendMessage(promptMessage);
 
 		while (!callbacksProcessed) {
 			try {

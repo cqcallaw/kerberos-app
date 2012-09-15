@@ -17,7 +17,6 @@ package net.brainvitamins.kerberos;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -100,8 +99,7 @@ public class KinitActivity extends Activity {
 					String principal = principalField.getText().toString();
 
 					Log.d("KerberosActivity", "Starting kinitAsync operation.");
-					KinitOperation.execute(principal, logMessageHandler,
-							promptHandler);
+					KinitOperation.execute(principal, messageHandler);
 				}
 			});
 
@@ -212,7 +210,7 @@ public class KinitActivity extends Activity {
 		authenticateButton
 				.setOnClickListener(toRequestingAuthenticationListener);
 
-		// TODO: handle lifetime (onDestroy)
+		// TODO: handle lifetime (onPause)
 		// TODO: handle cancellation
 		// TODO: store last principal used as a setting
 		// TODO: investigate the possibility of replacing krb5.conf or
@@ -239,7 +237,7 @@ public class KinitActivity extends Activity {
 	};
 
 	// library event handlers
-	Handler logMessageHandler = new Handler() {
+	Handler messageHandler = new Handler() {
 		public void handleMessage(Message message) {
 			if (message.what == KerberosOperation.LOG_MESSAGE) {
 				log((String) message.obj);
@@ -247,16 +245,7 @@ public class KinitActivity extends Activity {
 				stateGraph.transition(start);
 			} else if (message.what == KerberosOperation.AUTHENTICATION_FAILURE_MESSAGE) {
 				stateGraph.transition(failure);
-			} else {
-				Log.d(LOG_TAG, "Unrecognized message from Kerberos operation: "
-						+ message);
-			}
-		}
-	};
-
-	Handler promptHandler = new Handler() {
-		public void handleMessage(Message message) {
-			if (message.what == KerberosOperation.GET_CREDENTIALS_MESSAGE) {
+			} else if (message.what == KerberosOperation.PROMPTS_MESSAGE) {
 				callbackArray = (KerberosCallbackArray) message.obj;
 
 				for (javax.security.auth.callback.Callback callback : callbackArray
@@ -272,9 +261,8 @@ public class KinitActivity extends Activity {
 
 				stateGraph.transition(queryingUser);
 			} else {
-				Log.d(LOG_TAG,
-						"Unrecognized prompt message from Kerberos operation: "
-								+ message);
+				Log.d(LOG_TAG, "Unrecognized message from Kerberos operation: "
+						+ message);
 			}
 		}
 	};
