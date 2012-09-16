@@ -25,6 +25,7 @@ import net.brainvitamins.state.Edge;
 import net.brainvitamins.state.FiniteStateGraph;
 import net.brainvitamins.state.Vertex;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,6 +43,8 @@ import edu.mit.kerberos.R;
 public class KinitActivity extends Activity {
 
 	private static final String LOG_TAG = "KinitActivity";
+	private static final String principalKey = "principal";
+	private SharedPreferences preferences;
 
 	private static final Vertex start = new Vertex("START");
 	private static final Vertex requestingAuthentication = new Vertex(
@@ -54,6 +57,10 @@ public class KinitActivity extends Activity {
 
 	final Edge toStart = new Edge(start, new Runnable() {
 		public void run() {
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString(principalKey, principalField.getText().toString());
+			editor.commit();
+
 			authenticateButton.setText(R.string.label_start_authentication);
 
 			authenticateButton.setEnabled(true);
@@ -212,9 +219,11 @@ public class KinitActivity extends Activity {
 
 		// TODO: handle lifetime (onPause)
 		// TODO: handle cancellation
-		// TODO: store last principal used as a setting
 		// TODO: investigate the possibility of replacing krb5.conf or
 		// generating it from Android settings
+
+		preferences = getPreferences(MODE_PRIVATE);
+		principalField.setText(preferences.getString(principalKey, ""));
 	}
 
 	@Override
