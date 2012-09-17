@@ -854,6 +854,8 @@ static int k5_kinit(opts, k5)
             log("%s: Failed to contact KDC while %s\n", progname, doing);
         else if (code == KRB5KDC_ERR_C_PRINCIPAL_UNKNOWN)
             log("%s: Unknown principal while %s\n", progname, doing);
+        else if (code == KRB5_REALM_UNKNOWN)
+            log("%s: Unknown realm while %s\n", progname, doing);
         else
             com_err(progname, code, "while %s", doing);
         goto cleanup;
