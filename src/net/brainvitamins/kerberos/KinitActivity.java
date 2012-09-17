@@ -15,6 +15,10 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +29,7 @@ import net.brainvitamins.state.Edge;
 import net.brainvitamins.state.FiniteStateGraph;
 import net.brainvitamins.state.Vertex;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +37,7 @@ import android.os.Message;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -54,6 +60,8 @@ public class KinitActivity extends Activity {
 	private static final Vertex failure = new Vertex("FAILURE");
 
 	private KerberosCallbackArray callbackArray;
+
+	private static File localConfigurationFile;
 
 	final Edge toStart = new Edge(start, new Runnable() {
 		public void run() {
@@ -106,7 +114,8 @@ public class KinitActivity extends Activity {
 					String principal = principalField.getText().toString();
 
 					Log.d("KerberosActivity", "Starting kinitAsync operation.");
-					KinitOperation.execute(principal, messageHandler);
+					KinitOperation.execute(principal, localConfigurationFile,
+							messageHandler);
 				}
 			});
 
@@ -128,7 +137,8 @@ public class KinitActivity extends Activity {
 				promptEditField.setHint(asPasswordCallback.getPrompt());
 				if (!asPasswordCallback.isEchoOn())
 					promptEditField.setInputType(InputType.TYPE_CLASS_TEXT
-							| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+							| InputType.TYPE_TEXT_VARIATION_PASSWORD
+							| InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
 				conversationLayout.addView(promptEditField);
 			}
@@ -221,9 +231,43 @@ public class KinitActivity extends Activity {
 		// TODO: handle cancellation
 		// TODO: investigate the possibility of replacing krb5.conf or
 		// generating it from Android settings
+		// TODO: share credentials between apps:
+		// http://developer.android.com/guide/topics/providers/content-providers.html
 
 		preferences = getPreferences(MODE_PRIVATE);
 		principalField.setText(preferences.getString(principalKey, ""));
+
+		localConfigurationFile = new File(getFilesDir() + File.separator
+				+ "krb5.conf");
+
+		try {
+			Log.d(LOG_TAG, "Using configuration file: "
+					+ localConfigurationFile.getCanonicalPath().toString());
+		} catch (IOException e) {
+			Log.e(LOG_TAG, e.getMessage());
+		}
+
+		// make sure localConfigurationFile has a default value
+		if (!localConfigurationFile.exists()) {
+			InputStream is;
+			try {
+				Log.d(LOG_TAG, "Initializing local configuration file "
+						+ localConfigurationFile.getCanonicalPath().toString());
+				is = getAssets().open("krb5.conf");
+				int size = is.available();
+				byte[] buffer = new byte[size];
+				is.read(buffer);
+				is.close();
+
+				FileOutputStream fos = new FileOutputStream(
+						localConfigurationFile);
+				fos.write(buffer);
+				fos.close();
+
+			} catch (IOException e) {
+				Log.e(LOG_TAG, e.getMessage());
+			}
+		}
 	}
 
 	@Override
@@ -245,16 +289,39 @@ public class KinitActivity extends Activity {
 		}
 	};
 
-	// library event handlers
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+
+		case R.id.menu_settings:
+			Intent menuIntent = new Intent(this, ConfigurationActivity.class);
+			startActivity(menuIntent);
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	// library event handler
 	Handler messageHandler = new Handler() {
 		public void handleMessage(Message message) {
-			if (message.what == KerberosOperation.LOG_MESSAGE) {
+			switch (message.what) {
+
+			case KerberosOperation.LOG_MESSAGE:
 				log((String) message.obj);
-			} else if (message.what == KerberosOperation.AUTHENTICATION_SUCCESS_MESSAGE) {
+				break;
+
+			case KerberosOperation.AUTHENTICATION_SUCCESS_MESSAGE:
 				stateGraph.transition(start);
-			} else if (message.what == KerberosOperation.AUTHENTICATION_FAILURE_MESSAGE) {
+				break;
+
+			case KerberosOperation.AUTHENTICATION_FAILURE_MESSAGE:
 				stateGraph.transition(failure);
-			} else if (message.what == KerberosOperation.PROMPTS_MESSAGE) {
+				break;
+
+			case KerberosOperation.PROMPTS_MESSAGE:
 				callbackArray = (KerberosCallbackArray) message.obj;
 
 				for (javax.security.auth.callback.Callback callback : callbackArray
@@ -269,7 +336,9 @@ public class KinitActivity extends Activity {
 				}
 
 				stateGraph.transition(queryingUser);
-			} else {
+				break;
+
+			default:
 				Log.d(LOG_TAG, "Unrecognized message from Kerberos operation: "
 						+ message);
 			}
