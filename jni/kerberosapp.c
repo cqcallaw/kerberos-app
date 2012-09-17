@@ -98,6 +98,7 @@ int validate_caller(JNIEnv* env, jobject object)
     jthrowable exception;
 
     class = (*env)->GetObjectClass(env, object);
+
     (*env)->GetMethodID(env, class, LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
     exception = (*env)->ExceptionOccurred(env);
 
@@ -173,24 +174,24 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
  * Method:    nativeSetKRB5CCNAME
  * Signature: (Ljava/lang/String)I
  *
- * Set the KRB5CCNAME environment variable to point to our desired
- * ticket cache.
+ * Set an environment variable (e.g. KRB5CCNAME)
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeSetKRB5CCNAME(
-        JNIEnv* env, jobject obj, jstring argString)
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeSetEnv(
+        JNIEnv* env, jobject obj, jstring variable_name, jstring value)
 {
     jboolean isCopy;
     int ret;
-    const char *args;
+    const char *native_variable_name;
+    const char *native_value;
 
-    /* Get original KRB5CCNAME path string from Java */
-    args = (*env)->GetStringUTFChars(env, argString, &isCopy);
+    native_variable_name = (*env)->GetStringUTFChars(env, variable_name, NULL);
+    native_value = (*env)->GetStringUTFChars(env, value, NULL);
 
-    ret = setenv("KRB5CCNAME", args, 1);
+    ret = setenv(native_variable_name, native_value, 1);
 
-    /* free argString */
-    (*env)->ReleaseStringUTFChars(env, argString, args);
+    (*env)->ReleaseStringUTFChars(env, variable_name, native_variable_name);
+    (*env)->ReleaseStringUTFChars(env, value, native_value);
 
     return ret;
 }
@@ -203,7 +204,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
  * Wrapper around native kinit application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKinit(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKinit(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -409,10 +410,17 @@ void android_log_error(const char* progname, errcode_t code, const char* format,
 {
     va_list args;
     char errString[4096] = "Error ";
+    char errCodeString[16];
+
+    //insert error code
+    snprintf(errCodeString, sizeof(errCodeString), "%ld", code);
+    strcat(errString, errCodeString);
+    strcat(errString, " ");
 
     va_start(args, format);
-    vsnprintf(errString + 6, sizeof(errString), format, args);
+    vsnprintf(errString + strlen(errString), sizeof(errString), format, args);
     strcat(errString, "\n");
+
     android_log_message(errString);
     va_end(args);
 }
