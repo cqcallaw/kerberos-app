@@ -29,6 +29,8 @@ public abstract class KerberosOperation {
 
 	protected final Handler messageHandler;
 
+	public native int nativeSetEnv(String variableName, String value);
+
 	public KerberosOperation(Handler messageHandler) {
 		super();
 		this.messageHandler = messageHandler;
