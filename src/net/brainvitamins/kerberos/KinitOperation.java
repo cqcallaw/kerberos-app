@@ -15,6 +15,7 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -42,7 +43,8 @@ public class KinitOperation extends KerberosOperation implements
 	boolean callbacksProcessed = false;
 
 	/**
-	 * Private constructor to maintain state
+	 * Private constructor to enable the stateful interaction with the native
+	 * library
 	 * 
 	 * @param messageHandler
 	 */
@@ -50,16 +52,20 @@ public class KinitOperation extends KerberosOperation implements
 		super(messageHandler);
 	}
 
-	public static void execute(String principalName, Handler messageHandler) {
+	public static void execute(String principalName, File configurationFile,
+			Handler messageHandler) {
 		execute(principalName, Utilities.getDefaultCredentialsCache(),
-				messageHandler);
+				configurationFile, messageHandler);
 	}
 
 	public static void execute(String principalName,
-			CredentialsCacheFile credentialsCache, Handler messageHandler) {
+			CredentialsCacheFile credentialsCache, File configurationFile,
+			Handler messageHandler) {
 
 		KinitOperation operation = new KinitOperation(messageHandler);
 
+		// TODO: more validation (null checks, configuration file existence,
+		// etc)
 		if (!credentialsCache.getParentFile().exists()) {
 			operation
 					.log("ERROR: Credentials cache directory does not exist.\n");
@@ -69,8 +75,14 @@ public class KinitOperation extends KerberosOperation implements
 		}
 
 		try {
-			String kinitArguments = "-V -c "
-					+ credentialsCache.getCanonicalPath() + " " + principalName;
+			// String kinitArguments = "-V -c "
+			// + credentialsCache.getCanonicalPath() + " " + principalName;
+			operation.nativeSetEnv("KRB5_CONFIG", configurationFile
+					.getCanonicalPath().toString());
+			operation.nativeSetEnv("KRB5CCNAME", credentialsCache
+					.getCanonicalPath().toString());
+
+			String kinitArguments = "-V " + principalName;
 			launchNativeKinit(kinitArguments, operation);
 		} catch (Error e) {
 			operation.log("ERROR: " + e.getMessage());
@@ -84,13 +96,14 @@ public class KinitOperation extends KerberosOperation implements
 	}
 
 	public static void execute(String principalName, KeytabFile keytab,
-			Handler logMessageHandler) {
+			File configurationFile, Handler logMessageHandler) {
 		execute(principalName, keytab, Utilities.getDefaultCredentialsCache(),
-				logMessageHandler);
+				configurationFile, logMessageHandler);
 	}
 
 	public static void execute(String principalName, KeytabFile keytab,
-			CredentialsCacheFile credentialsCache, Handler messageHandler) {
+			CredentialsCacheFile credentialsCache, File configurationFile,
+			Handler messageHandler) {
 		KinitOperation operation = new KinitOperation(messageHandler);
 
 		// so much copy pasta...
@@ -103,10 +116,16 @@ public class KinitOperation extends KerberosOperation implements
 		}
 
 		try {
-			String kinitArguments = "-V -c "
-					+ credentialsCache.getCanonicalPath() + " -k -t "
-					+ keytab.getAbsolutePath() + " " + principalName;
+			// String kinitArguments = "-V -c "
+			// + credentialsCache.getCanonicalPath() + " -k -t "
+			// + keytab.getAbsolutePath() + " " + principalName;
+			operation.nativeSetEnv("KRB5_CONFIG", configurationFile
+					.getCanonicalPath().toString());
+			operation.nativeSetEnv("KRB5CCNAME", credentialsCache
+					.getCanonicalPath().toString());
 
+			String kinitArguments = "-V -k -t " + keytab.getAbsolutePath()
+					+ " " + principalName;
 			launchNativeKinit(kinitArguments, operation);
 		} catch (Error e) {
 			operation.log("ERROR: " + e.getMessage());
