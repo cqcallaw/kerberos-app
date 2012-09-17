@@ -20,7 +20,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
  * Method:    nativeKinit
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKinit
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKinit
   (JNIEnv *, jobject, jstring, jint);
 
 /*
