@@ -1,2 +1,5 @@
 obj/*
 src/edu/mit/kerberos/gss*
+.metadata
+bin
+libs
