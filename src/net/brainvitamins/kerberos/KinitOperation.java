@@ -17,8 +17,6 @@ package net.brainvitamins.kerberos;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.PasswordCallback;
@@ -32,9 +30,7 @@ import edu.mit.kerberos.KerberosOperations;
 public class KinitOperation extends KerberosOperation implements
 		AuthenticationDialogHandler {
 
-	public static final String LOG_TAG = "KinitRunner";
-
-	private static final Lock kinitLock = new ReentrantLock();
+	public static final String LOG_TAG = "KinitOperation";
 
 	// no simple way to integrate this with the MIT-licensed
 	// KerberosOperations...
@@ -140,9 +136,10 @@ public class KinitOperation extends KerberosOperation implements
 
 	private static void launchNativeKinit(final String kinitArguments,
 			final KinitOperation operation) {
+		// TODO: cancellation
 		new Thread() {
 			public void run() {
-				if (kinitLock.tryLock()) {
+				if (operationLock.tryLock()) {
 					Log.d(LOG_TAG, "Going native...");
 					try {
 						int authenticationResult = operation.nativeKinit(
@@ -156,14 +153,14 @@ public class KinitOperation extends KerberosOperation implements
 							operation.messageHandler
 									.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
 						}
-						kinitLock.unlock();
+						operationLock.unlock();
 					} catch (Error e) {
 						Log.i(LOG_TAG, e.getMessage());
-						kinitLock.unlock();
+						operationLock.unlock();
 						return;
 					}
 				} else {
-					Log.i(LOG_TAG,
+					Log.e(LOG_TAG,
 							"Attempted to launch multiple concurrent kinit calls.");
 				}
 			}

@@ -15,12 +15,15 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 public abstract class KerberosOperation {
-	public static final String LOG_TAG = "KinitOperation";
+	public static final String LOG_TAG = "KerberosOperation";
 
 	public static final int LOG_MESSAGE = 10;
 	public static final int PROMPTS_MESSAGE = 20;
@@ -30,6 +33,9 @@ public abstract class KerberosOperation {
 	protected final Handler messageHandler;
 
 	public native int nativeSetEnv(String variableName, String value);
+
+	// Lock to prevent multiple concurrent Kerberos operations
+	protected static final Lock operationLock = new ReentrantLock();
 
 	public KerberosOperation(Handler messageHandler) {
 		super();
