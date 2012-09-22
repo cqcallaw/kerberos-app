@@ -39,7 +39,7 @@ public class KerberosCallbackArray {
 		return source;
 	}
 
-	public KerberosCallbackArray(Callback[] callbacks, KinitOperation source) {
+	public KerberosCallbackArray(Callback[] callbacks, AuthenticationDialogHandler source) {
 		super();
 		this.callbacks = callbacks;
 		this.source = source;
