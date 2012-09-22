@@ -189,8 +189,8 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeS
     const char *native_variable_name;
     const char *native_value;
 
-    native_variable_name = (*env)->GetStringUTFChars(env, variable_name, NULL);
-    native_value = (*env)->GetStringUTFChars(env, value, NULL);
+    native_variable_name = (*env)->GetStringUTFChars(env, variable_name, &isCopy);
+    native_value = (*env)->GetStringUTFChars(env, value, &isCopy);
 
     LOGD(
             "Setting environment variable %s to %s", native_variable_name, native_value);
@@ -216,10 +216,10 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKini
 {
     jboolean isCopy;
     int ret;
-    int numArgs = (int) argCount;
+    int num_args = (int) argCount;
     const char *args;
     char *args_copy;
-    char **argv = (char**) malloc((numArgs + 2) * sizeof(char*));
+    char **argv = (char**) malloc((num_args + 2) * sizeof(char*));
 
     LOGD("Beginning kinit call");
 
@@ -240,13 +240,13 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKini
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, numArgs, argv);
+    generate_argv(args_copy, num_args, argv);
 
     /* run kinit */
-    ret = kinit_driver(env, obj, numArgs + 1, argv);
+    ret = kinit_driver(env, obj, num_args + 1, argv);
 
     free(args_copy);
-    release_argv(numArgs + 1, argv);
+    release_argv(num_args + 1, argv);
 
     (*env)->DeleteGlobalRef(env, cached_obj);
 
@@ -268,10 +268,10 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
 {
     jboolean isCopy;
     int ret;
-    int numArgs = (int) argCount;
+    int num_args = (int) argCount;
     const char *args;
     char *args_copy;
-    char **argv = (char**) malloc((numArgs + 2) * sizeof(char*));
+    char **argv = (char**) malloc((num_args + 2) * sizeof(char*));
 
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
@@ -290,13 +290,13 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, numArgs, argv);
+    generate_argv(args_copy, num_args, argv);
 
     /* run kinit */
-    ret = klist_driver(env, obj, numArgs + 1, argv);
+    ret = klist_driver(env, obj, num_args + 1, argv);
 
     free(args_copy);
-    release_argv(numArgs + 1, argv);
+    release_argv(num_args + 1, argv);
 
     if (ret == 1)
         return 1;
@@ -316,10 +316,10 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
 {
     jboolean isCopy;
     int ret;
-    int numArgs = (int) argCount;
+    int num_args = (int) argCount;
     const char *args;
     char *args_copy;
-    char **argv = (char**) malloc((numArgs + 2) * sizeof(char*));
+    char **argv = (char**) malloc((num_args + 2) * sizeof(char*));
 
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
@@ -338,13 +338,13 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, numArgs, argv);
+    generate_argv(args_copy, num_args, argv);
 
     /* run kinit */
-    ret = kvno_driver(env, obj, numArgs + 1, argv);
+    ret = kvno_driver(env, obj, num_args + 1, argv);
 
     free(args_copy);
-    release_argv(numArgs + 1, argv);
+    release_argv(num_args + 1, argv);
 
     if (ret == 1)
         return 1;
@@ -364,10 +364,10 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
 {
     jboolean isCopy;
     int ret;
-    int numArgs = (int) argCount;
+    int num_args = (int) argCount;
     const char *args;
     char *args_copy;
-    char **argv = (char**) malloc((numArgs + 2) * sizeof(char*));
+    char **argv = (char**) malloc((num_args + 2) * sizeof(char*));
 
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
@@ -386,13 +386,13 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, numArgs, argv);
+    generate_argv(args_copy, num_args, argv);
 
     /* run kdestroy */
-    ret = kdestroy_driver(env, obj, numArgs + 1, argv);
+    ret = kdestroy_driver(env, obj, num_args + 1, argv);
 
     free(args_copy);
-    release_argv(numArgs + 1, argv);
+    release_argv(num_args + 1, argv);
 
     if (ret == 1)
         return 1;
@@ -447,8 +447,8 @@ int android_log_message(char* input)
     JNIEnv* env;
 
     /*jclass message_class;
-    jmethodID message_constructor_method_id;
-    jobject message;*/
+     jmethodID message_constructor_method_id;
+     jobject message;*/
 
     jclass message_handler_class;
     jmethodID message_handler_method_id;
@@ -484,12 +484,12 @@ int android_log_message(char* input)
     message_handler_class = (*env)->GetObjectClass(env, cached_obj);
 
     /*message_class = (*env)->FindClass(env, "android/os/Message");
-    message_constructor_method_id = (*env)->GetStaticMethodID(env,
-            message_class, "obtain",
-            "(Landroid/os/Handler;ILjava/lang/Object;)Landroid/os/Message;");
-    message = (*env)->CallStaticObjectMethod(env, message_handler_class,
-            message_constructor_method_id, cached_obj, LOG_MESSAGE,
-            java_output);*/
+     message_constructor_method_id = (*env)->GetStaticMethodID(env,
+     message_class, "obtain",
+     "(Landroid/os/Handler;ILjava/lang/Object;)Landroid/os/Message;");
+     message = (*env)->CallStaticObjectMethod(env, message_handler_class,
+     message_constructor_method_id, cached_obj, LOG_MESSAGE,
+     java_output);*/
 
     message_handler_method_id = (*env)->GetMethodID(env, message_handler_class,
             LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
