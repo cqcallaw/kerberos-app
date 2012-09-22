@@ -51,8 +51,15 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.security.auth.callback.PasswordCallback;
+
+import net.brainvitamins.kerberos.KerberosCallbackArray;
+import net.brainvitamins.kerberos.KerberosOperation;
+import net.brainvitamins.kerberos.KinitOperation;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -90,57 +97,53 @@ public class KerberosAppActivity extends Activity implements
 		public void onClick(View v) {
 
 			TextView tv = (TextView) findViewById(R.id.textView);
-			EditText principal = (EditText) findViewById(R.id.editText1);
-			String prinValue = principal.getText().toString();
-			int ret = 0;
+			EditText principalField = (EditText) findViewById(R.id.editText1);
 
 			/* Clear TextView */
 			tv.setText("");
 
-			EditText passwordField = (EditText) findViewById(R.id.password);
+			final EditText passwordField = (EditText) findViewById(R.id.password);
 
-			String argString;
-			if (passwordField.getVisibility() == View.INVISIBLE) {
-				argString = "-V -c /data/local/kerberos/ccache/krb5cc_" + uid
-						+ " -k -t /data/local/kerberos/krb5.keytab "
-						+ prinValue;
-			} else {
-				argString = "-V -c /data/local/kerberos/ccache/krb5cc_" + uid
-						+ " " + prinValue;
-			}
+			Handler logMessageHandler = new Handler() {
+				public void handleMessage(Message message) {
+					if (message.what != KerberosOperation.LOG_MESSAGE) {
+						return;
+					}
 
-			try {
-				int t = nativeKinit(argString, countWords(argString));
-
-				Log.i("---JAVA JNI---", "Return value from native lib: " + t);
-
-				if (t == 0) {
-					tv.append("Got Ticket!\n");
-				} else if (t == 1) {
-					tv.append("Failed to get Ticket!\n");
+					log((String) message.obj);
 				}
-			} catch (Error e) {
-				log(e.getMessage());
-			}
+			};
+
+			Handler promptHandler = new Handler() {
+				public void handleMessage(Message message) {
+					if (message.what != KerberosOperation.PROMPTS_MESSAGE) {
+						return;
+					}
+
+					KerberosCallbackArray callbackArray = (KerberosCallbackArray) message.obj;
+
+					javax.security.auth.callback.Callback[] callbacks = callbackArray
+							.getCallbacks();
+
+					// if (!(callback instanceof PasswordCallback)) {
+					// throw new UnsupportedCallbackException(callback);
+
+					// setup UI elements
+
+					PasswordCallback callback0 = (PasswordCallback) callbacks[0];
+					passwordField.setHint(callback0.getPrompt());
+
+					(callback0).setPassword("password".toCharArray());
+
+					callbackArray.getSource().signalCallbackProcessFinished();
+				}
+			};
+
+			Log.d("KerberosActivity", "Starting kinitAsync operation.");
+			KinitOperation.execute(principalField.getText().toString(), null,
+					logMessageHandler);
 		}
 	};
-
-	private String[] kinitPrompter(String name, String banner,
-			final Prompt[] prompts) {
-		final String[] results = new String[prompts.length];
-
-		// blithely ignore prompts and multi-prompt scenarios, which a Real
-		// Implementation would need to handle.
-		if (prompts.length > 1) {
-			log("ERROR: Multi-prompt support not implemented!");
-			return results;
-		}
-
-		EditText editText = (EditText) findViewById(R.id.password);
-		results[0] = editText.getText().toString();
-
-		return results;
-	}
 
 	/**
 	 * Button listener for klist ("List Ticket") button.
@@ -285,13 +288,12 @@ public class KerberosAppActivity extends Activity implements
 		tv.setMovementMethod(new ScrollingMovementMethod());
 		tv.setTextSize(11);
 
-		uid = android.os.Process.myUid();
-		ret = nativeSetKRB5CCNAME("/data/local/kerberos/ccache/krb5cc_" + uid);
-		if (ret == 0) {
-			tv.append("Successfully set KRB5CCNAME path\n");
-		} else {
-			tv.append("Failed to set KRB5CCNAME path correctly\n");
-		}
+		/*
+		 * uid = android.os.Process.myUid(); ret =
+		 * nativeSetKRB5CCNAME("/data/local/kerberos/ccache/krb5cc_" + uid); if
+		 * (ret == 0) { tv.append("Successfully set KRB5CCNAME path\n"); } else
+		 * { tv.append("Failed to set KRB5CCNAME path correctly\n"); }
+		 */
 
 		String keytabPath = "/data/local/kerberos/krb5.keytab";
 
@@ -303,6 +305,10 @@ public class KerberosAppActivity extends Activity implements
 			EditText passwordField = (EditText) findViewById(R.id.password);
 			passwordField.setVisibility(View.INVISIBLE);
 		}
+
+		EditText principalField = (EditText) findViewById(R.id.editText1);
+
+		principalField.setText("ezra");
 	}
 
 	/**

@@ -58,6 +58,7 @@ public class KinitActivity extends Activity {
 	private static final Vertex queryingUser = new Vertex("USER CONVERSATION");
 	private static final Vertex sentCredentials = new Vertex("SENT CREDENTIALS");
 	private static final Vertex failure = new Vertex("FAILURE");
+	private static final Vertex cancelled = new Vertex("CANCELLED");
 
 	private KerberosCallbackArray callbackArray;
 
@@ -70,15 +71,16 @@ public class KinitActivity extends Activity {
 			editor.commit();
 
 			authenticateButton.setText(R.string.label_start_authentication);
+			resetUIComponents();
+		}
+	});
 
-			authenticateButton.setEnabled(true);
-			conversationLayout.removeAllViews();
-			principalField.requestFocus();
+	final Edge toCancelled = new Edge(cancelled, new Runnable() {
+		public void run() {
+			KinitOperation.cancel();
 
-			authenticateButton
-					.setOnClickListener(toRequestingAuthenticationListener);
-
-			principalField.setEnabled(true);
+			authenticateButton.setText(R.string.label_start_authentication);
+			resetUIComponents();
 		}
 	});
 
@@ -86,14 +88,7 @@ public class KinitActivity extends Activity {
 		public void run() {
 			authenticateButton.setText(R.string.label_retry_authentication);
 
-			authenticateButton.setEnabled(true);
-			conversationLayout.removeAllViews();
-			principalField.requestFocus();
-
-			authenticateButton
-					.setOnClickListener(toRequestingAuthenticationListener);
-
-			principalField.setEnabled(true);
+			resetUIComponents();
 		}
 	});
 
@@ -124,6 +119,8 @@ public class KinitActivity extends Activity {
 			authenticateButton.setText(R.string.label_complete_authentication);
 			authenticateButton.setEnabled(true);
 			authenticateButton.setOnClickListener(toSentCredentialsListener);
+
+			cancelButton.setVisibility(View.VISIBLE);
 
 			javax.security.auth.callback.Callback[] callbacks = callbackArray
 					.getCallbacks();
@@ -179,6 +176,12 @@ public class KinitActivity extends Activity {
 						}
 					});
 
+					put(cancelled, new HashSet<Edge>() {
+						{
+							add(toRequestingAuthentication);
+						}
+					});
+
 					put(requestingAuthentication, new HashSet<Edge>() {
 						{
 							add(toFailure);
@@ -188,6 +191,7 @@ public class KinitActivity extends Activity {
 
 					put(queryingUser, new HashSet<Edge>() {
 						{
+							add(toCancelled);
 							add(toFailure);
 							add(toSentCredentials);
 						}
@@ -209,6 +213,7 @@ public class KinitActivity extends Activity {
 			}, start);
 
 	private Button authenticateButton;
+	private Button cancelButton;
 	private EditText principalField;
 	private LinearLayout conversationLayout;
 
@@ -221,6 +226,7 @@ public class KinitActivity extends Activity {
 		setContentView(R.layout.activity_kinit);
 
 		authenticateButton = (Button) findViewById(R.id.authentication);
+		cancelButton = (Button) findViewById(R.id.cancel);
 		principalField = (EditText) findViewById(R.id.principal);
 		conversationLayout = (LinearLayout) findViewById(R.id.conversation_layout);
 
@@ -289,6 +295,10 @@ public class KinitActivity extends Activity {
 		}
 	};
 
+	public void cancel(View v) {
+		KinitOperation.cancel();
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
@@ -321,6 +331,10 @@ public class KinitActivity extends Activity {
 				stateGraph.transition(failure);
 				break;
 
+			case KerberosOperation.AUTHENTICATION_CANCEL_MESSAGE:
+				stateGraph.transition(cancelled);
+				break;
+
 			case KerberosOperation.PROMPTS_MESSAGE:
 				callbackArray = (KerberosCallbackArray) message.obj;
 
@@ -348,5 +362,17 @@ public class KinitActivity extends Activity {
 	private void log(String input) {
 		TextView tv = (TextView) findViewById(R.id.log);
 		tv.append(input);
+	}
+
+	private void resetUIComponents() {
+		authenticateButton.setEnabled(true);
+		cancelButton.setVisibility(View.GONE);
+		conversationLayout.removeAllViews();
+		principalField.requestFocus();
+
+		authenticateButton
+				.setOnClickListener(toRequestingAuthenticationListener);
+
+		principalField.setEnabled(true);
 	}
 }

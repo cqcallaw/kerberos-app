@@ -28,6 +28,14 @@
         android:layout_height="wrap_content"
         android:text="@string/label_start_authentication" />
 
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="cancel"
+        android:text="@string/label_cancel"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/log"
         android:layout_width="match_parent"

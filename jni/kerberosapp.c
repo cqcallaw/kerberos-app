@@ -181,7 +181,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
  * Set an environment variable (e.g. KRB5CCNAME)
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeSetEnv(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperationNativeWrapper_nativeSetEnv(
         JNIEnv* env, jobject obj, jstring variable_name, jstring value)
 {
     jboolean isCopy;
@@ -211,7 +211,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeS
  * Wrapper around native kinit application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKinit(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapper_nativeKinit(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;

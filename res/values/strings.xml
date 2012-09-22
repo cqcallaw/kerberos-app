@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Kerberos App</string>
+
+    <string name="app_name">Kerberos</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_kinit">Kinit</string>
+    <string name="principal_hint">principal</string>
+    <string name="label_start_authentication">Begin</string>
+    <string name="label_initializing_authentication">Contacting KDC…</string>
+    <string name="label_authenticating">Authenticating…</string>
+    <string name="label_complete_authentication">Authenticate</string>
+    <string name="label_retry_authentication">Retry</string>
+    <string name="label_save">Save</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="hello_world">Hello world! looooooooooooooooooooooooooooooooooooonnnnnnng test</string>
+    <string name="title_activity_configuration">Configuration</string>
+
 </resources>

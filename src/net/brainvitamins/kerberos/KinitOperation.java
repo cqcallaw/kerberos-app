@@ -18,192 +18,161 @@ package net.brainvitamins.kerberos;
 import java.io.File;
 import java.io.IOException;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import edu.mit.kerberos.KerberosOperations;
 
-public class KinitOperation extends KerberosOperation implements
-		AuthenticationDialogHandler {
+public class KinitOperation extends KerberosOperation {
 
 	public static final String LOG_TAG = "KinitOperation";
 
-	// no simple way to integrate this with the MIT-licensed
-	// KerberosOperations...
-	private native int nativeKinit(String argv, int argc);
+	public static KinitOperationNativeWrapper wrapper;
 
-	boolean callbacksProcessed = false;
-
-	/**
-	 * Private constructor to enable the stateful interaction with the native
-	 * library
-	 * 
-	 * @param messageHandler
-	 */
-	private KinitOperation(Handler messageHandler) {
-		super(messageHandler);
-	}
-
-	public static void execute(String principalName, File configurationFile,
-			Handler messageHandler) {
+	public synchronized static void execute(String principalName,
+			File configurationFile, Handler messageHandler) {
 		execute(principalName, Utilities.getDefaultCredentialsCache(),
 				configurationFile, messageHandler);
 	}
 
-	public static void execute(String principalName,
-			CredentialsCacheFile credentialsCache, File configurationFile,
-			Handler messageHandler) {
-
-		KinitOperation operation = new KinitOperation(messageHandler);
+	public synchronized static void execute(String principalName,
+			final CredentialsCacheFile credentialsCache,
+			final File configurationFile, final Handler messageHandler) {
 
 		// TODO: more validation (null checks, configuration file existence,
 		// etc)
 		if (!credentialsCache.getParentFile().exists()) {
-			operation
-					.log("ERROR: Credentials cache directory does not exist.\n");
-			operation.messageHandler
-					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+			log(messageHandler,
+					"ERROR: Credentials cache directory does not exist.\n");
+			messageHandler.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
 			return;
 		}
 
-		try {
-			// String kinitArguments = "-V -c "
-			// + credentialsCache.getCanonicalPath() + " " + principalName;
-			operation.nativeSetEnv("KRB5_CONFIG", configurationFile
-					.getCanonicalPath().toString());
-			operation.nativeSetEnv("KRB5CCNAME", credentialsCache
-					.getCanonicalPath().toString());
+		final String kinitArguments = "-V " + principalName;
 
-			String kinitArguments = "-V " + principalName;
-			launchNativeKinit(kinitArguments, operation);
-		} catch (Error e) {
-			operation.log("ERROR: " + e.getMessage());
-			operation.messageHandler
-					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
-		} catch (IOException io) {
-			operation.log("ERROR: " + io.getMessage());
-			operation.messageHandler
-					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
-		}
-	}
-
-	public static void execute(String principalName, KeytabFile keytab,
-			File configurationFile, Handler logMessageHandler) {
-		execute(principalName, keytab, Utilities.getDefaultCredentialsCache(),
-				configurationFile, logMessageHandler);
-	}
-
-	public static void execute(String principalName, KeytabFile keytab,
-			CredentialsCacheFile credentialsCache, File configurationFile,
-			Handler messageHandler) {
-		KinitOperation operation = new KinitOperation(messageHandler);
-
-		// so much copy pasta...
-		if (!credentialsCache.getParentFile().exists()) {
-			operation
-					.log("ERROR: Credentials cache directory does not exist.\n");
-			operation.messageHandler
-					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
-			return;
-		}
-
-		try {
-			// String kinitArguments = "-V -c "
-			// + credentialsCache.getCanonicalPath() + " -k -t "
-			// + keytab.getAbsolutePath() + " " + principalName;
-			operation.nativeSetEnv("KRB5_CONFIG", configurationFile
-					.getCanonicalPath().toString());
-			operation.nativeSetEnv("KRB5CCNAME", credentialsCache
-					.getCanonicalPath().toString());
-
-			String kinitArguments = "-V -k -t " + keytab.getAbsolutePath()
-					+ " " + principalName;
-			launchNativeKinit(kinitArguments, operation);
-		} catch (Error e) {
-			operation.log("ERROR: " + e.getMessage());
-			operation.messageHandler
-					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
-		} catch (IOException io) {
-			operation.log("ERROR: " + io.getMessage());
-			operation.messageHandler
-					.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
-		}
-	}
-
-	private static void launchNativeKinit(final String kinitArguments,
-			final KinitOperation operation) {
-		// TODO: cancellation
-		new Thread() {
+		operation = new Thread() {
 			public void run() {
 				if (operationLock.tryLock()) {
-					Log.d(LOG_TAG, "Going native...");
 					try {
-						int authenticationResult = operation.nativeKinit(
+						wrapper = new KinitOperationNativeWrapper(
+								messageHandler);
+						wrapper.nativeSetEnv("KRB5_CONFIG", configurationFile
+								.getCanonicalPath().toString());
+						wrapper.nativeSetEnv("KRB5CCNAME", credentialsCache
+								.getCanonicalPath().toString());
+
+						Log.d(LOG_TAG, "Going native...");
+						int authenticationResult = wrapper.nativeKinit(
 								kinitArguments,
 								KerberosOperations.countWords(kinitArguments));
 
 						if (authenticationResult == 0) {
-							operation.messageHandler
+							wrapper.messageHandler
 									.sendEmptyMessage(AUTHENTICATION_SUCCESS_MESSAGE);
 						} else {
-							operation.messageHandler
+							wrapper.messageHandler
 									.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
 						}
-						operationLock.unlock();
 					} catch (Error e) {
-						Log.i(LOG_TAG, e.getMessage());
+						wrapper.log("ERROR: " + e.getMessage());
+						wrapper.messageHandler
+								.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+					} catch (IOException io) {
+						wrapper.log("ERROR: " + io.getMessage());
+						wrapper.messageHandler
+								.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+					} finally {
+						// we'll maintain a reference to this thread object
+						// until the next operation...
 						operationLock.unlock();
-						return;
 					}
 				} else {
 					Log.e(LOG_TAG,
 							"Attempted to launch multiple concurrent kinit calls.");
 				}
 			}
-		}.start();
+		};
+
+		operation.start();
 	}
 
-	public synchronized String[] kinitPrompter(String name, String banner,
-			Callback[] callbacks) throws UnsupportedCallbackException,
-			IOException {
-		String[] result = new String[callbacks.length];
-
-		KerberosCallbackArray callbackArray = new KerberosCallbackArray(
-				callbacks, this);
-
-		Message promptMessage = Message.obtain(messageHandler, PROMPTS_MESSAGE,
-				callbackArray);
-
-		messageHandler.sendMessage(promptMessage);
-
-		while (!callbacksProcessed) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return result;
-			}
+	public synchronized static void cancel() {
+		if (operation != null) {
+			operation.interrupt();
+		} else {
+			Log.d(LOG_TAG, "Cancel attempt with no running operations.");
 		}
-
-		for (int i = 0; i < callbacks.length; i++) {
-			Callback callback = callbacks[i];
-			if (!(callback instanceof PasswordCallback)) {
-				throw new UnsupportedCallbackException(callback);
-			} else {
-				result[i] = new String(
-						((PasswordCallback) callback).getPassword());
-			}
-		}
-
-		return result;
 	}
+	// public static void execute(String principalName, KeytabFile keytab,
+	// File configurationFile, Handler logMessageHandler) {
+	// execute(principalName, keytab, Utilities.getDefaultCredentialsCache(),
+	// configurationFile, logMessageHandler);
+	// }
+	//
+	// public static void execute(String principalName, KeytabFile keytab,
+	// CredentialsCacheFile credentialsCache, File configurationFile,
+	// final Handler messageHandler) {
+	// // so much copy pasta...
+	// if (!credentialsCache.getParentFile().exists()) {
+	// logMessage(messageHandler,
+	// "ERROR: Credentials cache directory does not exist.\n");
+	// messageHandler.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+	// return;
+	// }
+	//
+	// final String kinitArguments = "-V -k -t " + keytab.getAbsolutePath()
+	// + " " + principalName;
+	//
+	// KinitOperation operation = new KinitOperation(new Thread() {
+	// public void run() {
+	// launchNativeKinit(kinitArguments, messageHandler);
+	// }
+	//
+	// }, messageHandler);
+	//
+	// try {
+	// operation.nativeSetEnv("KRB5_CONFIG", configurationFile
+	// .getCanonicalPath().toString(), messageHandler);
+	// operation.nativeSetEnv("KRB5CCNAME", credentialsCache
+	// .getCanonicalPath().toString(), messageHandler);
+	//
+	// } catch (Error e) {
+	// operation.logMessage("ERROR: " + e.getMessage());
+	// operation.messageHandler
+	// .sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+	// } catch (IOException io) {
+	// operation.logMessage("ERROR: " + io.getMessage());
+	// operation.messageHandler
+	// .sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+	// }
+	//
+	// operation.operation.start();
+	// }
 
-	public synchronized void signalCallbackProcessFinished() {
-		callbacksProcessed = true;
-		notifyAll();
-	}
+	// private void launchNativeKinit(final String kinitArguments,
+	// KinitOperationNativeWrapper wrapper) {
+	// // TODO: cancellation
+	// if (operationLock.tryLock()) {
+	// Log.d(LOG_TAG, "Going native...");
+	// try {
+	// int authenticationResult = wrapper.nativeKinit(kinitArguments,
+	// KerberosOperations.countWords(kinitArguments));
+	//
+	// if (authenticationResult == 0) {
+	// wrapper.messageHandler
+	// .sendEmptyMessage(AUTHENTICATION_SUCCESS_MESSAGE);
+	// } else {
+	// wrapper.messageHandler
+	// .sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+	// }
+	// operationLock.unlock();
+	// } catch (Error e) {
+	// Log.i(LOG_TAG, e.getMessage());
+	// operationLock.unlock();
+	// return;
+	// }
+	// } else {
+	// Log.e(LOG_TAG,
+	// "Attempted to launch multiple concurrent kinit calls.");
+	// }
+	// }
 }

@@ -23,33 +23,27 @@ import android.os.Message;
 import android.util.Log;
 
 public abstract class KerberosOperation {
+	static {
+		System.loadLibrary("kerberosapp");
+	}
+
 	public static final String LOG_TAG = "KerberosOperation";
 
 	public static final int LOG_MESSAGE = 10;
 	public static final int PROMPTS_MESSAGE = 20;
 	public static final int AUTHENTICATION_FAILURE_MESSAGE = 30;
 	public static final int AUTHENTICATION_SUCCESS_MESSAGE = 40;
-
-	protected final Handler messageHandler;
-
-	public native int nativeSetEnv(String variableName, String value);
+	public static final int AUTHENTICATION_CANCEL_MESSAGE = 50;
 
 	// Lock to prevent multiple concurrent Kerberos operations
 	protected static final Lock operationLock = new ReentrantLock();
 
-	public KerberosOperation(Handler messageHandler) {
-		super();
-		this.messageHandler = messageHandler;
-	}
+	protected static Thread operation = null;
 
-	public void log(String message) {
+	public static void log(Handler messageHandler, String message) {
 		Log.d(LOG_TAG, message);
 		Message logMessage = Message.obtain(messageHandler, LOG_MESSAGE,
 				message);
 		messageHandler.sendMessage(logMessage);
-	}
-
-	static {
-		System.loadLibrary("kerberosapp");
 	}
 }

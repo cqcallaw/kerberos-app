@@ -21,6 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:onClick="saveConfiguration"
-        android:text="@string/label_save_configuration" />
+        android:text="@string/label_save" />
 
 </LinearLayout>

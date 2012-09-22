@@ -12,7 +12,7 @@ extern "C" {
  * Method:    nativeSetKRB5CCNAME
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeSetEnv
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperationNativeWrapper_nativeSetEnv
   (JNIEnv *, jobject, jstring, jstring);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeS
  * Method:    nativeKinit
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKinit
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapper_nativeKinit
   (JNIEnv *, jobject, jstring, jint);
 
 /*
