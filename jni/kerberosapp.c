@@ -97,6 +97,8 @@ int validate_caller(JNIEnv* env, jobject object)
     jclass class;
     jthrowable exception;
 
+    LOGD("Validating caller...");
+
     class = (*env)->GetObjectClass(env, object);
 
     (*env)->GetMethodID(env, class, LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
@@ -112,6 +114,8 @@ int validate_caller(JNIEnv* env, jobject object)
 
     if (exception)
         return 1;
+
+    LOGD("Caller validated.");
 
     return 0;
 }
@@ -141,7 +145,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
     JNIEnv* env;
 
-    LOGI("Loaded Kerberos library");
+    LOGD("Loaded Kerberos library");
 
     if ((*jvm)->GetEnv(jvm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
         return -1;
@@ -188,6 +192,9 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeS
     native_variable_name = (*env)->GetStringUTFChars(env, variable_name, NULL);
     native_value = (*env)->GetStringUTFChars(env, value, NULL);
 
+    LOGD(
+            "Setting environment variable %s to %s", native_variable_name, native_value);
+
     ret = setenv(native_variable_name, native_value, 1);
 
     (*env)->ReleaseStringUTFChars(env, variable_name, native_variable_name);
@@ -214,6 +221,8 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKini
     char *args_copy;
     char **argv = (char**) malloc((numArgs + 2) * sizeof(char*));
 
+    LOGD("Beginning kinit call");
+
     /* Cache a reference to the calling object */
     cached_obj = (*env)->NewGlobalRef(env, obj);
 
@@ -238,6 +247,8 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperation_nativeKini
 
     free(args_copy);
     release_argv(numArgs + 1, argv);
+
+    (*env)->DeleteGlobalRef(env, cached_obj);
 
     if (ret == 1)
         return 1;
@@ -434,25 +445,63 @@ void android_log_error(const char* progname, errcode_t code, const char* format,
 int android_log_message(char* input)
 {
     JNIEnv* env;
-    jclass cls;
-    jmethodID mid;
-    jstring javaOutput;
+
+    /*jclass message_class;
+    jmethodID message_constructor_method_id;
+    jobject message;*/
+
+    jclass message_handler_class;
+    jmethodID message_handler_method_id;
+    jstring java_output;
+
+    LOGD("Logging message: %s", input);
+
+    if (cached_obj == NULL)
+    {
+        LOGI("Message handler null in android_log_message.");
+        return 1;
+    }
 
     env = GetJNIEnv(cached_jvm);
-    cls = (*env)->GetObjectClass(env, cached_obj);
-    mid = (*env)->GetMethodID(env, cls, LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
+
+    if (env == NULL)
+    {
+        LOGI("Environment variable null in android_log_message.");
+        return 1;
+    }
 
     // doing exception checking here does no good since the VM will terminate
     // if other functions are called after the exception occurs.
     // We can't control the behavior of functions that call this function,
     // so we need to do the error checking upstream (in validate_error)
-    javaOutput = (*env)->NewStringUTF(env, input);
-    if (env == NULL || cached_obj == NULL || mid == NULL || javaOutput == NULL)
+    java_output = (*env)->NewStringUTF(env, input);
+    if (java_output == NULL)
     {
-        LOGI("Null variable in android_log_message input.");
+        LOGI("Failed to generate string output in android_log_message.");
         return 1;
     }
-    (*env)->CallVoidMethod(env, cached_obj, mid, javaOutput);
+
+    message_handler_class = (*env)->GetObjectClass(env, cached_obj);
+
+    /*message_class = (*env)->FindClass(env, "android/os/Message");
+    message_constructor_method_id = (*env)->GetStaticMethodID(env,
+            message_class, "obtain",
+            "(Landroid/os/Handler;ILjava/lang/Object;)Landroid/os/Message;");
+    message = (*env)->CallStaticObjectMethod(env, message_handler_class,
+            message_constructor_method_id, cached_obj, LOG_MESSAGE,
+            java_output);*/
+
+    message_handler_method_id = (*env)->GetMethodID(env, message_handler_class,
+            LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
+
+    if (message_handler_method_id == NULL)
+    {
+        LOGI("Failed to get method id in android_log_message.");
+        return 1;
+    }
+
+    (*env)->CallVoidMethod(env, cached_obj, message_handler_method_id,
+            java_output);
 
     return 0;
 }

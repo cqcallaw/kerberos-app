@@ -12,8 +12,8 @@ extern "C" {
  * Method:    nativeSetKRB5CCNAME
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeSetKRB5CCNAME
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperation_nativeSetEnv
+  (JNIEnv *, jobject, jstring, jstring);
 
 /*
  * Class:     net_brainvitamins_kerberos_KerberosOperations

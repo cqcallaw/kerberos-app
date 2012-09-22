@@ -48,6 +48,7 @@ extern jobject cached_obj;
 
 #define  LOG_TAG    "---KERBEROS---"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
 #define log(...)        android_log(__VA_ARGS__)
 #define com_err(progname, code, ...)    android_log_error(progname, code, __VA_ARGS__)
