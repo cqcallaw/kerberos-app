@@ -189,7 +189,8 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperationNativeWr
     const char *native_variable_name;
     const char *native_value;
 
-    native_variable_name = (*env)->GetStringUTFChars(env, variable_name, &isCopy);
+    native_variable_name = (*env)->GetStringUTFChars(env, variable_name,
+            &isCopy);
     native_value = (*env)->GetStringUTFChars(env, value, &isCopy);
 
     LOGD(
@@ -250,9 +251,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapp
 
     (*env)->DeleteGlobalRef(env, cached_obj);
 
-    if (ret == 1)
-        return 1;
-    return 0;
+    return ret;
 }
 
 /*

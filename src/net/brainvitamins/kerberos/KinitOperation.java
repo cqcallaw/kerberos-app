@@ -65,13 +65,17 @@ public class KinitOperation extends KerberosOperation {
 								kinitArguments,
 								KerberosOperations.countWords(kinitArguments));
 
-						if (authenticationResult == 0) {
+						Log.d(LOG_TAG, "Native return code: "
+								+ authenticationResult);
+						if (authenticationResult == AUTHENTICATION_SUCCESS_MESSAGE
+								|| authenticationResult == AUTHENTICATION_CANCEL_MESSAGE) {
 							wrapper.messageHandler
-									.sendEmptyMessage(AUTHENTICATION_SUCCESS_MESSAGE);
+									.sendEmptyMessage(authenticationResult);
 						} else {
 							wrapper.messageHandler
 									.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
 						}
+
 					} catch (Error e) {
 						wrapper.log("ERROR: " + e.getMessage());
 						wrapper.messageHandler

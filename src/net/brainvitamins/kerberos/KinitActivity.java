@@ -58,7 +58,13 @@ public class KinitActivity extends Activity {
 	private static final Vertex queryingUser = new Vertex("USER CONVERSATION");
 	private static final Vertex sentCredentials = new Vertex("SENT CREDENTIALS");
 	private static final Vertex failure = new Vertex("FAILURE");
-	private static final Vertex cancelled = new Vertex("CANCELLED");
+	private static final Vertex success = new Vertex("SUCCESS");
+
+	private Button authenticateButton;
+	private Button cancelButton;
+	private EditText principalField;
+	private LinearLayout conversationLayout;
+	private TextView logView;
 
 	private KerberosCallbackArray callbackArray;
 
@@ -66,18 +72,19 @@ public class KinitActivity extends Activity {
 
 	final Edge toStart = new Edge(start, new Runnable() {
 		public void run() {
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putString(principalKey, principalField.getText().toString());
-			editor.commit();
+			KinitOperation.cancel(); // cancel any running operations
+			logView.setText("");
 
 			authenticateButton.setText(R.string.label_start_authentication);
 			resetUIComponents();
 		}
 	});
 
-	final Edge toCancelled = new Edge(cancelled, new Runnable() {
+	final Edge toSuccess = new Edge(success, new Runnable() {
 		public void run() {
-			KinitOperation.cancel();
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString(principalKey, principalField.getText().toString());
+			editor.commit();
 
 			authenticateButton.setText(R.string.label_start_authentication);
 			resetUIComponents();
@@ -95,7 +102,6 @@ public class KinitActivity extends Activity {
 	final Edge toRequestingAuthentication = new Edge(requestingAuthentication,
 			new Runnable() {
 				public void run() {
-					TextView logView = (TextView) findViewById(R.id.log);
 					logView.setText("");
 
 					authenticateButton
@@ -176,12 +182,6 @@ public class KinitActivity extends Activity {
 						}
 					});
 
-					put(cancelled, new HashSet<Edge>() {
-						{
-							add(toRequestingAuthentication);
-						}
-					});
-
 					put(requestingAuthentication, new HashSet<Edge>() {
 						{
 							add(toFailure);
@@ -191,7 +191,7 @@ public class KinitActivity extends Activity {
 
 					put(queryingUser, new HashSet<Edge>() {
 						{
-							add(toCancelled);
+							add(toStart);
 							add(toFailure);
 							add(toSentCredentials);
 						}
@@ -201,21 +201,19 @@ public class KinitActivity extends Activity {
 						{
 							add(toStart);
 							add(toFailure);
+							add(toSuccess);
 						}
 					});
 
 					put(failure, new HashSet<Edge>() {
 						{
+							add(toStart); // use case: opens Settings, then
+											// returns to the main activity
 							add(toRequestingAuthentication);
 						}
 					});
 				}
 			}, start);
-
-	private Button authenticateButton;
-	private Button cancelButton;
-	private EditText principalField;
-	private LinearLayout conversationLayout;
 
 	private static LayoutParams passwordPromptLayoutParameters = new LayoutParams(
 			LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -229,14 +227,14 @@ public class KinitActivity extends Activity {
 		cancelButton = (Button) findViewById(R.id.cancel);
 		principalField = (EditText) findViewById(R.id.principal);
 		conversationLayout = (LinearLayout) findViewById(R.id.conversation_layout);
+		logView = (TextView) findViewById(R.id.log);
 
 		authenticateButton
 				.setOnClickListener(toRequestingAuthenticationListener);
 
-		// TODO: handle lifetime (onPause)
-		// TODO: handle cancellation
 		// TODO: investigate the possibility of replacing krb5.conf or
 		// generating it from Android settings
+		// -flex/bison?
 		// TODO: share credentials between apps:
 		// http://developer.android.com/guide/topics/providers/content-providers.html
 
@@ -280,6 +278,15 @@ public class KinitActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_kinit, menu);
 		return true;
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+
+		if (stateGraph.getCurrentState() != start) {
+			stateGraph.transition(start);
+		}
 	}
 
 	// UI event handlers
@@ -332,7 +339,7 @@ public class KinitActivity extends Activity {
 				break;
 
 			case KerberosOperation.AUTHENTICATION_CANCEL_MESSAGE:
-				stateGraph.transition(cancelled);
+				stateGraph.transition(start);
 				break;
 
 			case KerberosOperation.PROMPTS_MESSAGE:
@@ -360,8 +367,7 @@ public class KinitActivity extends Activity {
 	};
 
 	private void log(String input) {
-		TextView tv = (TextView) findViewById(R.id.log);
-		tv.append(input);
+		logView.append(input);
 	}
 
 	private void resetUIComponents() {

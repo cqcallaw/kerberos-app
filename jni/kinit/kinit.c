@@ -42,6 +42,8 @@
 #include "kerberosapp.h"
 static JNIEnv* jni_env;
 static jobject class_obj;
+
+#define ANDROID_AUTHENTICATION_CANCELLED 40
 #else
 #define log(...)    fprintf(stderr, __VA_ARGS__)
 #endif /* ANDROID */
@@ -647,9 +649,14 @@ kinit_prompter(krb5_context ctx, void *data, const char *name,
     jclass calling_class;
     jmethodID prompter_method_id;
 
-    jobjectArray result_array;
-    jstring result;
-    const char * native_result;
+    jmethodID get_result_method_id;
+
+    jint prompter_result;
+
+    jcharArray password_result;
+    jchar * password_result_jchars;
+    jstring utf_password_result;
+    char * native_password_result;
 
     int i;
 
@@ -659,6 +666,8 @@ kinit_prompter(krb5_context ctx, void *data, const char *name,
     prompt_class = (*jni_env)->FindClass(jni_env, "javax/security/auth/callback/PasswordCallback");
     prompt_constructor_id = (*jni_env)->GetMethodID(jni_env, prompt_class, "<init>", "(Ljava/lang/String;Z)V");
     prompt_array = (*jni_env)->NewObjectArray(jni_env, num_prompts, prompt_class, NULL);
+
+    get_result_method_id = (*jni_env)->GetMethodID(jni_env, prompt_class, "getPassword", "()[C");
 
     for(i = 0; i < num_prompts; i++)
     {
@@ -674,36 +683,41 @@ kinit_prompter(krb5_context ctx, void *data, const char *name,
     (*jni_env)->GetMethodID(jni_env, calling_class, KINIT_PROMPTER_METHOD_NAME, KINIT_PROMPTER_METHOD_SIGNATURE);
 
     //make the call
-    result_array = (*jni_env)->CallObjectMethod(jni_env, class_obj, prompter_method_id,
+    prompter_result = (jint)(*jni_env)->CallIntMethod(jni_env, class_obj, prompter_method_id,
             name_string, banner_string, prompt_array);
 
-    if (result_array == NULL)
-    return KRB5_LIBOS_CANTREADPWD;
+    if (prompter_result == ANDROID_AUTHENTICATION_CANCELLED)
+    return ANDROID_AUTHENTICATION_CANCELLED;
 
     for(i = 0; i < num_prompts; i++)
     {
-        result = (jstring)(*jni_env)->GetObjectArrayElement(jni_env, result_array, i);
+        prompt = (*jni_env)->GetObjectArrayElement(jni_env, prompt_array, i);
 
-        if (result == NULL)
+        if (prompt == NULL)
         {
             log("Null result from Java prompter at index %i", i);
             return KRB5_LIBOS_CANTREADPWD;
         }
 
-        native_result = (*jni_env)->GetStringUTFChars(jni_env, result, NULL);
+        //this technique may not always work: http://developer.android.com/guide/practices/jni.html#UTF_8_and_UTF_16_strings
+        password_result = (jcharArray)(*jni_env)->CallObjectMethod(jni_env, prompt, get_result_method_id);
+        password_result_jchars = (*jni_env)->GetCharArrayElements(jni_env, password_result, NULL);
+        utf_password_result = (*jni_env)->NewString(jni_env, password_result_jchars, (*jni_env)->GetArrayLength(jni_env, password_result));
+        native_password_result = (*jni_env)->GetStringUTFChars(jni_env, utf_password_result, NULL);
+        (*jni_env)->ReleaseCharArrayElements(jni_env, password_result, password_result_jchars, 0);
 
-        if (native_result == NULL)
+        if (native_password_result == NULL)
         {
             log("Null result getting native representation of index %i", i);
             return KRB5_LIBOS_CANTREADPWD;
         }
 
         //construct result
-        snprintf(prompts[i].reply->data, prompts[i].reply->length, "%s", native_result);
-        prompts[i].reply->length = strlen(native_result);
+        snprintf(prompts[i].reply->data, prompts[i].reply->length, "%s", native_password_result);
+        prompts[i].reply->length = strlen(native_password_result);
 
         //snprintf duplicates the string, so it is safe to release here
-        (*jni_env)->ReleaseStringUTFChars(jni_env, result, native_result);
+        (*jni_env)->ReleaseStringUTFChars(jni_env, utf_password_result, native_password_result);
     }
     return 0;
 #endif
@@ -848,7 +862,10 @@ static int k5_kinit(opts, k5)
             break;
         }
 
-        if (code == KRB5KRB_AP_ERR_BAD_INTEGRITY)
+        if (code == ANDROID_AUTHENTICATION_CANCELLED)
+        { // do nothing
+        }
+        else if (code == KRB5KRB_AP_ERR_BAD_INTEGRITY)
             log("%s: Password incorrect while %s\n", progname, doing);
         else if (code == KRB5_KDC_UNREACH)
             log("%s: Failed to contact KDC while %s\n", progname, doing);
@@ -900,7 +917,8 @@ static int k5_kinit(opts, k5)
     krb5_free_cred_contents(k5->ctx, &my_creds);
     if (keytab)
         krb5_kt_close(k5->ctx, keytab);
-    return notix ? 0 : 1;
+
+    return notix ? code : 0;
 }
 
 #ifndef ANDROID
@@ -952,7 +970,7 @@ char **argv;
 {
     struct k_opts opts;
     struct k5_data k5;
-    int authed_k5 = 0;
+    int kinit_result = 0;
 
     /* save JNI environment */
     jni_env = env;
@@ -989,22 +1007,17 @@ char **argv;
 
     if (k5_begin(&opts, &k5))
     {
-        authed_k5 = k5_kinit(&opts, &k5);
+        kinit_result = k5_kinit(&opts, &k5);
     }
 
-    if (authed_k5 && opts.verbose)
+    if (kinit_result == 0 && opts.verbose)
     {
         log("Authenticated to Kerberos v5\n");
     }
 
     k5_end(&k5);
 
-    if (!authed_k5)
-    {
-        return 1;
-    }
-
-    return 0;
+    return kinit_result;
 }
 #endif /* ANDROID */
 

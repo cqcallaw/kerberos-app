@@ -10,6 +10,7 @@ import net.brainvitamins.kerberos.KerberosOperationNativeWrapper;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 /**
  * Protected wrapper to enable the stateful interaction with the native library
@@ -29,15 +30,9 @@ class KinitOperationNativeWrapper extends KerberosOperationNativeWrapper
 		super(messageHandler);
 	}
 
-	public synchronized String[] kinitPrompter(String name, String banner,
+	public synchronized int kinitPrompter(String name, String banner,
 			Callback[] callbacks) throws UnsupportedCallbackException,
 			IOException {
-		String[] result = new String[callbacks.length];
-
-		// populate result with default values
-		for (int i = 0; i < result.length; i++) {
-			result[i] = "";
-		}
 
 		KerberosCallbackArray callbackArray = new KerberosCallbackArray(
 				callbacks, this);
@@ -51,23 +46,11 @@ class KinitOperationNativeWrapper extends KerberosOperationNativeWrapper
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				messageHandler
-						.sendEmptyMessage(KerberosOperation.AUTHENTICATION_CANCEL_MESSAGE);
-				return result;
+				return KerberosOperation.AUTHENTICATION_CANCEL_MESSAGE;
 			}
 		}
-
-		for (int i = 0; i < callbacks.length; i++) {
-			Callback callback = callbacks[i];
-			if (!(callback instanceof PasswordCallback)) {
-				throw new UnsupportedCallbackException(callback);
-			} else {
-				result[i] = new String(
-						((PasswordCallback) callback).getPassword());
-			}
-		}
-
-		return result;
+		
+		return 0;
 	}
 
 	public synchronized void signalCallbackProcessFinished() {
