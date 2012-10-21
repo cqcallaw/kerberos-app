@@ -39,7 +39,8 @@ public class KerberosCallbackArray {
 		return source;
 	}
 
-	public KerberosCallbackArray(Callback[] callbacks, KerberosCallbackArraySource source) {
+	public KerberosCallbackArray(Callback[] callbacks,
+			KerberosCallbackArraySource source) {
 		super();
 		this.callbacks = callbacks;
 		this.source = source;

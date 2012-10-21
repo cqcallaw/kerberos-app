@@ -211,7 +211,7 @@ public class KinitActivity extends Activity {
 							// returns to the main activity
 						}
 					});
-					
+
 					put(failure, new HashSet<Edge>() {
 						{
 							add(toStart); // use case: opens Settings, then

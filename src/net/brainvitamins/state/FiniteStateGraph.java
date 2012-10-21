@@ -70,12 +70,13 @@ public final class FiniteStateGraph {
 					currentState = edge.getEnd();
 					Log.d(LOG_TAG, "Transition to state "
 							+ edge.getEnd().getName() + " complete");
-					return; //successful transition
+					return; // successful transition
 				}
 			}
 		}
 
-		//failure: no state matches, or there are no valid transitions away from this state.
+		// failure: no state matches, or there are no valid transitions away
+		// from this state.
 		Log.e(LOG_TAG, "Cannot transition from state " + currentState.getName()
 				+ " to state " + targetState.getName());
 	}
