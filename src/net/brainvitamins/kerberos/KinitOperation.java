@@ -38,11 +38,29 @@ public class KinitOperation extends KerberosOperation {
 			final CredentialsCacheFile credentialsCache,
 			final File configurationFile, final Handler messageHandler) {
 
-		// TODO: more validation (null checks, configuration file existence,
-		// etc)
+		if (credentialsCache == null) {
+			log(messageHandler,
+					"ERROR: Credentials cache file reference cannot be null.\n");
+			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
+			return;
+		}
+
 		if (!credentialsCache.getParentFile().exists()) {
 			log(messageHandler,
 					"ERROR: Credentials cache directory does not exist.\n");
+			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
+			return;
+		}
+
+		if (configurationFile == null) {
+			log(messageHandler,
+					"ERROR: Configuration file reference cannot be null.\n");
+			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
+			return;
+		}
+
+		if (!configurationFile.exists()) {
+			log(messageHandler, "ERROR: Configuration file does not exist.\n");
 			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
 			return;
 		}
