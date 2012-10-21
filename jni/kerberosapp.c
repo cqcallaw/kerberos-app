@@ -42,34 +42,35 @@ jobject cached_obj;
  * Note: argv begins with command name, and is
  *       NULL terminated (thus the +2)
  */
-void generate_argv(char* input, int argc, char** argv)
+void generate_argv(int command_string_length, char* command_string,
+        char* argument_string, int argc, char** argv)
 {
     int i;
     char* tmp;
 
     LOGI("Entered generate_argv");
-    for (i = 0; i < argc + 2; i++)
+
+    argv[0] = (char*) malloc(command_string_length * sizeof(char*));
+    strcpy(argv[0], command_string);
+
+    //handle arguments
+    for (i = 1; i < argc + 1; i++)
     {
-        if (i == 0)
-        { /* add command name */
-            argv[i] = (char*) malloc(5 * sizeof(char*));
-            strcpy(argv[i], "kinit");
-        }
-        else if (i == argc + 1) /* add NULL termination */
-            argv[i] = NULL;
-        else if (i == 1)
+        if (i == 1)
         {
-            tmp = strtok(input, " ");
-            argv[i] = (char*) malloc((strlen(tmp) + 1) * sizeof(char*));
-            strcpy(argv[i], tmp);
+            tmp = strtok(argument_string, " ");
         }
         else
         {
             tmp = strtok(NULL, " ");
-            argv[i] = (char*) malloc((strlen(tmp) + 1) * sizeof(char*));
-            strcpy(argv[i], tmp);
         }
+
+        argv[i] = (char*) malloc((strlen(tmp) + 1) * sizeof(char*));
+        strcpy(argv[i], tmp);
     }
+
+    argv[argc + 1] = NULL;
+
     return;
 }
 
@@ -102,14 +103,6 @@ int validate_caller(JNIEnv* env, jobject object)
     class = (*env)->GetObjectClass(env, object);
 
     (*env)->GetMethodID(env, class, LOG_METHOD_NAME, LOG_METHOD_SIGNATURE);
-    exception = (*env)->ExceptionOccurred(env);
-
-    if (exception)
-        return 1;
-
-    class = (*env)->GetObjectClass(env, object);
-    (*env)->GetMethodID(env, class, KINIT_PROMPTER_METHOD_NAME,
-            KINIT_PROMPTER_METHOD_SIGNATURE);
     exception = (*env)->ExceptionOccurred(env);
 
     if (exception)
@@ -222,6 +215,9 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapp
     char *args_copy;
     char **argv = (char**) malloc((num_args + 2) * sizeof(char*));
 
+    jclass class;
+    jthrowable exception;
+
     LOGD("Beginning kinit call");
 
     /* Cache a reference to the calling object */
@@ -229,6 +225,18 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapp
 
     if (validate_caller(env, obj))
         return 1;
+
+    // additional validation: we need a kinitPrompter method
+    class = (*env)->GetObjectClass(env, obj);
+    (*env)->GetMethodID(env, class, KINIT_PROMPTER_METHOD_NAME,
+            KINIT_PROMPTER_METHOD_SIGNATURE);
+    exception = (*env)->ExceptionOccurred(env);
+
+    if (exception)
+    {
+        LOGE("Extended kinit validation failed.");
+        return 1;
+    }
 
     /* get original argv string from Java */
     args = (*env)->GetStringUTFChars(env, argString, &isCopy);
@@ -241,7 +249,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapp
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, num_args, argv);
+    generate_argv(5, "kinit", args_copy, num_args, argv);
 
     /* run kinit */
     ret = kinit_driver(env, obj, num_args + 1, argv);
@@ -262,7 +270,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapp
  * Wrapper around native klist application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKlist(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KlistOperationNativeWrapper_nativeKlist(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -289,9 +297,9 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, num_args, argv);
+    generate_argv(5, "klist", args_copy, num_args, argv);
 
-    /* run kinit */
+    /* run klist */
     ret = klist_driver(env, obj, num_args + 1, argv);
 
     free(args_copy);
@@ -337,9 +345,9 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, num_args, argv);
+    generate_argv(4, "kvno", args_copy, num_args, argv);
 
-    /* run kinit */
+    /* run kvno */
     ret = kvno_driver(env, obj, num_args + 1, argv);
 
     free(args_copy);
@@ -385,7 +393,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
     (*env)->ReleaseStringUTFChars(env, argString, args);
 
     /* generate argv list */
-    generate_argv(args_copy, num_args, argv);
+    generate_argv(8, "kdestroy", args_copy, num_args, argv);
 
     /* run kdestroy */
     ret = kdestroy_driver(env, obj, num_args + 1, argv);

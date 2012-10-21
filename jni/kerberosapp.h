@@ -46,15 +46,16 @@ extern jobject cached_obj;
 
 #define MAX_APPEND_STRING_SZ    4096
 
-#define  LOG_TAG    "---KERBEROS---"
+#define  LOG_TAG    "[native]"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 #define log(...)        android_log(__VA_ARGS__)
 #define com_err(progname, code, ...)    android_log_error(progname, code, __VA_ARGS__)
 
 extern JNIEnv* GetJNIEnv(JavaVM *jvm);
-extern void generate_argv(char*, int, char**);
+extern void generate_argv(int, char*, char*, int, char**);
 extern void release_argv(int, char**);
 
 extern void android_log(const char*, ...);

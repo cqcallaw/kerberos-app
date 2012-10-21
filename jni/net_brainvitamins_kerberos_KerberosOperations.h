@@ -28,7 +28,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapp
  * Method:    nativeKlist
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKlist
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KlistOperationNativeWrapper_nativeKlist
   (JNIEnv *, jobject, jstring, jint);
 
 /*
