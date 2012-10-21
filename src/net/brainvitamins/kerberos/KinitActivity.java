@@ -239,6 +239,9 @@ public class KinitActivity extends Activity {
 		authenticateButton
 				.setOnClickListener(toRequestingAuthenticationListener);
 
+		Button listButton = (Button) findViewById(R.id.list);
+		listButton.setOnClickListener(klist);
+
 		// TODO: investigate the possibility of replacing krb5.conf or
 		// generating it from Android settings
 		// -flex/bison?
@@ -309,6 +312,13 @@ public class KinitActivity extends Activity {
 		}
 	};
 
+	public View.OnClickListener klist = new View.OnClickListener() {
+		public void onClick(View v) {
+			KlistOperation.execute(Utilities.getDefaultCredentialsCache(),
+					localConfigurationFile, messageHandler);
+		}
+	};
+
 	public void cancel(View v) {
 		KinitOperation.cancel();
 	}
@@ -332,7 +342,6 @@ public class KinitActivity extends Activity {
 	Handler messageHandler = new Handler() {
 		public void handleMessage(Message message) {
 			switch (message.what) {
-
 			case KerberosOperation.LOG_MESSAGE:
 				log((String) message.obj);
 				break;
