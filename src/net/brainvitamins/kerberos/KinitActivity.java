@@ -205,6 +205,13 @@ public class KinitActivity extends Activity {
 						}
 					});
 
+					put(success, new HashSet<Edge>() {
+						{
+							add(toStart); // use case: opens Settings, then
+							// returns to the main activity
+						}
+					});
+					
 					put(failure, new HashSet<Edge>() {
 						{
 							add(toStart); // use case: opens Settings, then
