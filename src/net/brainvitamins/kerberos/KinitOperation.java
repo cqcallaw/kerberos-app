@@ -16,11 +16,9 @@ package net.brainvitamins.kerberos;
  */
 
 import java.io.File;
-import java.io.IOException;
 
 import android.os.Handler;
 import android.util.Log;
-import edu.mit.kerberos.KerberosOperations;
 
 public class KinitOperation extends KerberosOperation {
 
@@ -38,83 +36,8 @@ public class KinitOperation extends KerberosOperation {
 			final CredentialsCacheFile credentialsCache,
 			final File configurationFile, final Handler messageHandler) {
 
-		if (credentialsCache == null) {
-			log(messageHandler,
-					"ERROR: Credentials cache file reference cannot be null.\n");
-			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
-			return;
-		}
-
-		if (!credentialsCache.getParentFile().exists()) {
-			log(messageHandler,
-					"ERROR: Credentials cache directory does not exist.\n");
-			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
-			return;
-		}
-
-		if (configurationFile == null) {
-			log(messageHandler,
-					"ERROR: Configuration file reference cannot be null.\n");
-			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
-			return;
-		}
-
-		if (!configurationFile.exists()) {
-			log(messageHandler, "ERROR: Configuration file does not exist.\n");
-			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
-			return;
-		}
-
-		final String kinitArguments = "-V " + principalName;
-
-		operation = new Thread() {
-			public void run() {
-				if (operationLock.tryLock()) {
-					try {
-						wrapper = new KinitOperationNativeWrapper(
-								messageHandler);
-						wrapper.nativeSetEnv("KRB5_CONFIG", configurationFile
-								.getCanonicalPath().toString());
-						wrapper.nativeSetEnv("KRB5CCNAME", credentialsCache
-								.getCanonicalPath().toString());
-
-						Log.d(LOG_TAG, "Going native...");
-						int authenticationResult = wrapper.nativeKinit(
-								kinitArguments,
-								KerberosOperations.countWords(kinitArguments));
-
-						Log.d(LOG_TAG, "Native return code: "
-								+ authenticationResult);
-						if (authenticationResult == SUCCESS_MESSAGE
-								|| authenticationResult == CANCEL_MESSAGE) {
-							wrapper.messageHandler
-									.sendEmptyMessage(authenticationResult);
-						} else {
-							wrapper.messageHandler
-									.sendEmptyMessage(FAILURE_MESSAGE);
-						}
-
-					} catch (Error e) {
-						wrapper.log("ERROR: " + e.getMessage());
-						wrapper.messageHandler
-								.sendEmptyMessage(FAILURE_MESSAGE);
-					} catch (IOException io) {
-						wrapper.log("ERROR: " + io.getMessage());
-						wrapper.messageHandler
-								.sendEmptyMessage(FAILURE_MESSAGE);
-					} finally {
-						// we'll maintain a reference to this thread object
-						// until the next operation...
-						operationLock.unlock();
-					}
-				} else {
-					Log.e(LOG_TAG,
-							"Attempted to launch multiple concurrent kinit calls.");
-				}
-			}
-		};
-
-		operation.start();
+		execute("-V " + principalName, new KinitOperationNativeWrapper(
+				messageHandler), credentialsCache, configurationFile);
 	}
 
 	public synchronized static void cancel() {

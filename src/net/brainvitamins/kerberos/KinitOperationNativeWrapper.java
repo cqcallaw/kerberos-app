@@ -53,4 +53,9 @@ class KinitOperationNativeWrapper extends KerberosOperationNativeWrapper
 		callbacksProcessed = true;
 		notifyAll();
 	}
+
+	@Override
+	public int executeNativeOperation(String arguments, int argumentCount) {
+		return nativeKinit(arguments, argumentCount);
+	}
 }
