@@ -29,11 +29,11 @@ public abstract class KerberosOperation {
 
 	public static final String LOG_TAG = "KerberosOperation";
 
-	public static final int AUTHENTICATION_SUCCESS_MESSAGE = 0;
+	public static final int SUCCESS_MESSAGE = 0;
 	public static final int LOG_MESSAGE = 10;
 	public static final int PROMPTS_MESSAGE = 20;
-	public static final int AUTHENTICATION_FAILURE_MESSAGE = 30;
-	public static final int AUTHENTICATION_CANCEL_MESSAGE = 40;
+	public static final int FAILURE_MESSAGE = 30;
+	public static final int CANCEL_MESSAGE = 40;
 
 	// Lock to prevent multiple concurrent Kerberos operations
 	protected static final Lock operationLock = new ReentrantLock();

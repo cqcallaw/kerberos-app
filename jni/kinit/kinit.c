@@ -43,7 +43,6 @@
 static JNIEnv* jni_env;
 static jobject class_obj;
 
-#define ANDROID_AUTHENTICATION_CANCELLED 40
 #else
 #define log(...)    fprintf(stderr, __VA_ARGS__)
 #endif /* ANDROID */
@@ -686,8 +685,8 @@ kinit_prompter(krb5_context ctx, void *data, const char *name,
     prompter_result = (jint)(*jni_env)->CallIntMethod(jni_env, class_obj, prompter_method_id,
             name_string, banner_string, prompt_array);
 
-    if (prompter_result == ANDROID_AUTHENTICATION_CANCELLED)
-    return ANDROID_AUTHENTICATION_CANCELLED;
+    if (prompter_result == ANDROID_OPERATION_CANCELLED)
+    return ANDROID_OPERATION_CANCELLED;
 
     for(i = 0; i < num_prompts; i++)
     {
@@ -862,7 +861,7 @@ static int k5_kinit(opts, k5)
             break;
         }
 
-        if (code == ANDROID_AUTHENTICATION_CANCELLED)
+        if (code == ANDROID_OPERATION_CANCELLED)
         { // do nothing
         }
         else if (code == KRB5KRB_AP_ERR_BAD_INTEGRITY)

@@ -3,14 +3,10 @@ package net.brainvitamins.kerberos;
 import java.io.IOException;
 
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-
-import net.brainvitamins.kerberos.KerberosOperationNativeWrapper;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 /**
  * Protected wrapper to enable the stateful interaction with the native library
@@ -20,7 +16,7 @@ import android.util.Log;
  * 
  */
 class KinitOperationNativeWrapper extends KerberosOperationNativeWrapper
-		implements AuthenticationDialogHandler {
+		implements KerberosCallbackArraySource {
 
 	public native int nativeKinit(String argv, int argc);
 
@@ -46,10 +42,10 @@ class KinitOperationNativeWrapper extends KerberosOperationNativeWrapper
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				return KerberosOperation.AUTHENTICATION_CANCEL_MESSAGE;
+				return KerberosOperation.CANCEL_MESSAGE;
 			}
 		}
-		
+
 		return 0;
 	}
 

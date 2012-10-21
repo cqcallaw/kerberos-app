@@ -15,7 +15,6 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//TODO: pick a better type name
-public interface AuthenticationDialogHandler {
+public interface KerberosCallbackArraySource {
 	void signalCallbackProcessFinished();
 }

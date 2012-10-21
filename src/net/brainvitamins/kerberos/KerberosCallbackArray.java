@@ -33,13 +33,13 @@ public class KerberosCallbackArray {
 		return callbacks;
 	}
 
-	AuthenticationDialogHandler source;
+	KerberosCallbackArraySource source;
 
-	public AuthenticationDialogHandler getSource() {
+	public KerberosCallbackArraySource getSource() {
 		return source;
 	}
 
-	public KerberosCallbackArray(Callback[] callbacks, AuthenticationDialogHandler source) {
+	public KerberosCallbackArray(Callback[] callbacks, KerberosCallbackArraySource source) {
 		super();
 		this.callbacks = callbacks;
 		this.source = source;

@@ -73,6 +73,8 @@ int validate_caller(JNIEnv* env, jobject object);
 #define KINIT_PROMPTER_METHOD_NAME "kinitPrompter"
 #define KINIT_PROMPTER_METHOD_SIGNATURE "(Ljava/lang/String;Ljava/lang/String;[Ljavax/security/auth/callback/Callback;)I"
 
+#define ANDROID_OPERATION_CANCELLED 40
+
 #ifdef __cplusplus
 }
 #endif

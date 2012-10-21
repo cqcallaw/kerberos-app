@@ -330,15 +330,15 @@ public class KinitActivity extends Activity {
 				log((String) message.obj);
 				break;
 
-			case KerberosOperation.AUTHENTICATION_SUCCESS_MESSAGE:
-				stateGraph.transition(start);
+			case KerberosOperation.SUCCESS_MESSAGE:
+				stateGraph.transition(success);
 				break;
 
-			case KerberosOperation.AUTHENTICATION_FAILURE_MESSAGE:
+			case KerberosOperation.FAILURE_MESSAGE:
 				stateGraph.transition(failure);
 				break;
 
-			case KerberosOperation.AUTHENTICATION_CANCEL_MESSAGE:
+			case KerberosOperation.CANCEL_MESSAGE:
 				stateGraph.transition(start);
 				break;
 

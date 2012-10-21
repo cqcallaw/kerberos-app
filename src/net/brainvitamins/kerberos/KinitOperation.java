@@ -43,7 +43,7 @@ public class KinitOperation extends KerberosOperation {
 		if (!credentialsCache.getParentFile().exists()) {
 			log(messageHandler,
 					"ERROR: Credentials cache directory does not exist.\n");
-			messageHandler.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+			messageHandler.sendEmptyMessage(FAILURE_MESSAGE);
 			return;
 		}
 
@@ -67,23 +67,23 @@ public class KinitOperation extends KerberosOperation {
 
 						Log.d(LOG_TAG, "Native return code: "
 								+ authenticationResult);
-						if (authenticationResult == AUTHENTICATION_SUCCESS_MESSAGE
-								|| authenticationResult == AUTHENTICATION_CANCEL_MESSAGE) {
+						if (authenticationResult == SUCCESS_MESSAGE
+								|| authenticationResult == CANCEL_MESSAGE) {
 							wrapper.messageHandler
 									.sendEmptyMessage(authenticationResult);
 						} else {
 							wrapper.messageHandler
-									.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+									.sendEmptyMessage(FAILURE_MESSAGE);
 						}
 
 					} catch (Error e) {
 						wrapper.log("ERROR: " + e.getMessage());
 						wrapper.messageHandler
-								.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+								.sendEmptyMessage(FAILURE_MESSAGE);
 					} catch (IOException io) {
 						wrapper.log("ERROR: " + io.getMessage());
 						wrapper.messageHandler
-								.sendEmptyMessage(AUTHENTICATION_FAILURE_MESSAGE);
+								.sendEmptyMessage(FAILURE_MESSAGE);
 					} finally {
 						// we'll maintain a reference to this thread object
 						// until the next operation...
@@ -154,7 +154,6 @@ public class KinitOperation extends KerberosOperation {
 
 	// private void launchNativeKinit(final String kinitArguments,
 	// KinitOperationNativeWrapper wrapper) {
-	// // TODO: cancellation
 	// if (operationLock.tryLock()) {
 	// Log.d(LOG_TAG, "Going native...");
 	// try {
