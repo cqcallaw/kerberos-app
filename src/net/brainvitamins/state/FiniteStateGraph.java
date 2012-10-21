@@ -61,18 +61,21 @@ public final class FiniteStateGraph {
 	}
 
 	public synchronized void transition(Vertex targetState) {
-		for (Edge edge : map.get(currentState)) {
-			if (edge.getEnd() == targetState) { // reference equality
-				Log.d(LOG_TAG, "Transitioning to state "
-						+ edge.getEnd().getName());
-				edge.getAction().run();
-				currentState = edge.getEnd();
-				Log.d(LOG_TAG, "Transition to state " + edge.getEnd().getName()
-						+ " complete");
-				return;
+		if (map.get(currentState) != null) {
+			for (Edge edge : map.get(currentState)) {
+				if (edge.getEnd() == targetState) { // reference equality
+					Log.d(LOG_TAG, "Transitioning to state "
+							+ edge.getEnd().getName());
+					edge.getAction().run();
+					currentState = edge.getEnd();
+					Log.d(LOG_TAG, "Transition to state "
+							+ edge.getEnd().getName() + " complete");
+					return; //successful transition
+				}
 			}
 		}
 
+		//failure: no state matches, or there are no valid transitions away from this state.
 		Log.e(LOG_TAG, "Cannot transition from state " + currentState.getName()
 				+ " to state " + targetState.getName());
 	}
