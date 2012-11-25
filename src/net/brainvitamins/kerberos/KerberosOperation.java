@@ -45,14 +45,16 @@ public abstract class KerberosOperation {
 				message);
 		messageHandler.sendMessage(logMessage);
 	}
-	
+
 	// Lock to prevent multiple concurrent Kerberos operations
 	protected static final Lock operationLock = new ReentrantLock();
 
 	protected static Thread operation = null;
 
 	/**
-	 * Helper function to handle the validation logic and threading of Kerberos operations
+	 * Helper function to handle the validation logic and threading of Kerberos
+	 * operations
+	 * 
 	 * @param operationArguments
 	 * @param wrapper
 	 * @param credentialsCache
@@ -62,9 +64,9 @@ public abstract class KerberosOperation {
 			final KerberosOperationNativeWrapper wrapper,
 			final CredentialsCacheFile credentialsCache,
 			final File configurationFile) {
-		
+
 		Handler messageHandler = wrapper.getMessageHandler();
-		
+
 		if (credentialsCache == null) {
 			log(messageHandler,
 					"ERROR: Credentials cache file reference cannot be null.\n");

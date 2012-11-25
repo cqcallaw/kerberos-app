@@ -23,8 +23,6 @@ public class KlistOperation extends KerberosOperation {
 
 	public static final String LOG_TAG = "KlistOperation";
 
-	// private static KlistOperationNativeWrapper wrapper;
-
 	public synchronized static void execute(
 			final CredentialsCacheFile credentialsCache,
 			final File configurationFile, final Handler messageHandler) {
