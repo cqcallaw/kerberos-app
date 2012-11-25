@@ -12,6 +12,8 @@
     <string name="label_retry_authentication">Retry</string>
     <string name="label_save">Save</string>
     <string name="label_cancel">Cancel</string>
+    <string name="label_list">Show Cache</string>
+    <string name="label_destroy">Destroy Cache</string>
     <string name="hello_world">Hello world! looooooooooooooooooooooooooooooooooooonnnnnnng test</string>
     <string name="title_activity_configuration">Configuration</string>
 

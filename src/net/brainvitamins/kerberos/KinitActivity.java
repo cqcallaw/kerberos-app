@@ -29,6 +29,7 @@ import net.brainvitamins.state.Edge;
 import net.brainvitamins.state.FiniteStateGraph;
 import net.brainvitamins.state.Vertex;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -62,6 +64,8 @@ public class KinitActivity extends Activity {
 
 	private Button authenticateButton;
 	private Button cancelButton;
+	private Button listButton;
+	private Button destroyButton;
 	private EditText principalField;
 	private LinearLayout conversationLayout;
 	private TextView logView;
@@ -104,6 +108,9 @@ public class KinitActivity extends Activity {
 				public void run() {
 					logView.setText("");
 
+					listButton.setVisibility(View.GONE);
+					destroyButton.setVisibility(View.GONE);
+
 					authenticateButton
 							.setText(R.string.label_initializing_authentication);
 					authenticateButton.setEnabled(false);
@@ -114,7 +121,7 @@ public class KinitActivity extends Activity {
 
 					String principal = principalField.getText().toString();
 
-					Log.d("KerberosActivity", "Starting kinitAsync operation.");
+					Log.d("KerberosActivity", "Starting async kinit operation.");
 					KinitOperation.execute(principal, localConfigurationFile,
 							messageHandler);
 				}
@@ -208,7 +215,8 @@ public class KinitActivity extends Activity {
 					put(success, new HashSet<Edge>() {
 						{
 							add(toStart); // use case: opens Settings, then
-							// returns to the main activity
+											// returns to the main activity
+							add(toRequestingAuthentication);
 						}
 					});
 
@@ -232,6 +240,9 @@ public class KinitActivity extends Activity {
 
 		authenticateButton = (Button) findViewById(R.id.authentication);
 		cancelButton = (Button) findViewById(R.id.cancel);
+		listButton = (Button) findViewById(R.id.list);
+		destroyButton = (Button) findViewById(R.id.destroy);
+
 		principalField = (EditText) findViewById(R.id.principal);
 		conversationLayout = (LinearLayout) findViewById(R.id.conversation_layout);
 		logView = (TextView) findViewById(R.id.log);
@@ -274,11 +285,31 @@ public class KinitActivity extends Activity {
 						localConfigurationFile);
 				fos.write(buffer);
 				fos.close();
-
 			} catch (IOException e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}
 		}
+
+		listButton.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				clearView();
+
+				KlistOperation.execute(Utilities.getDefaultCredentialsCache(),
+						localConfigurationFile, messageHandler);
+			}
+		});
+
+		destroyButton.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				clearView();
+
+				KdestroyOperation.execute(
+						Utilities.getDefaultCredentialsCache(),
+						localConfigurationFile, messageHandler);
+			}
+		});
 	}
 
 	@Override
@@ -377,9 +408,19 @@ public class KinitActivity extends Activity {
 		logView.append(input);
 	}
 
+	private void clearView() {
+		logView.setText("");
+
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+	}
+
 	private void resetUIComponents() {
 		authenticateButton.setEnabled(true);
 		cancelButton.setVisibility(View.GONE);
+		listButton.setVisibility(View.VISIBLE);
+		destroyButton.setVisibility(View.VISIBLE);
+
 		conversationLayout.removeAllViews();
 		principalField.requestFocus();
 

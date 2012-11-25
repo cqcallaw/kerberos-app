@@ -36,6 +36,18 @@
         android:text="@string/label_cancel"
         android:visibility="gone" />
 
+    <Button
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_list" />
+
+    <Button
+        android:id="@+id/destroy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_destroy" />
+
     <TextView
         android:id="@+id/log"
         android:layout_width="match_parent"
