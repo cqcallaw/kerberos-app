@@ -318,7 +318,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KlistOperationNativeWrapp
  * Wrapper around native kvno application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKvno(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KvnoOperationNativeWrapper_nativeKvno(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -366,7 +366,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
  * Wrapper around native kdestroy application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKdestroy(
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KdestroyOperationNativeWrapper_nativeKdestroy(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;

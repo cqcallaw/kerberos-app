@@ -36,7 +36,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KlistOperationNativeWrapp
  * Method:    nativeKvno
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKvno
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KvnoOperationNativeWrapper_nativeKvno
   (JNIEnv *, jobject, jstring, jint);
 
 /*
@@ -44,7 +44,7 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_native
  * Method:    nativeKdestroy
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperations_nativeKdestroy
+JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KdestroyOperationNativeWrapper_nativeKdestroy
   (JNIEnv *, jobject, jstring, jint);
 
 #ifdef __cplusplus
