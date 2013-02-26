@@ -23,7 +23,7 @@
         <!-- </intent-filter> -->
         <!-- </activity> -->
         <activity
-            android:name="net.brainvitamins.kerberos.KinitActivity"
+            android:name="net.brainvitamins.kerberos.KerberosActivity"
             android:label="@string/title_activity_kinit" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

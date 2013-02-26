@@ -48,7 +48,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import edu.mit.kerberos.R;
 
-public class KinitActivity extends Activity {
+public class KerberosActivity extends Activity {
 
 	private static final String LOG_TAG = "KinitActivity";
 	private static final String principalKey = "principal";
@@ -142,7 +142,7 @@ public class KinitActivity extends Activity {
 			for (javax.security.auth.callback.Callback callback : callbacks) {
 				PasswordCallback asPasswordCallback = (PasswordCallback) callback;
 
-				EditText promptEditField = new EditText(KinitActivity.this);
+				EditText promptEditField = new EditText(KerberosActivity.this);
 				promptEditField.setLayoutParams(passwordPromptLayoutParameters);
 				promptEditField.setHint(asPasswordCallback.getPrompt());
 				if (!asPasswordCallback.isEchoOn())
