@@ -74,6 +74,9 @@ public class KerberosActivity extends Activity {
 
 	private static File localConfigurationFile;
 
+	private static LayoutParams passwordPromptLayoutParameters = new LayoutParams(
+			LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+
 	final Edge toStart = new Edge(start, new Runnable() {
 		public void run() {
 			KinitOperation.cancel(); // cancel any running operations
@@ -229,9 +232,6 @@ public class KerberosActivity extends Activity {
 					});
 				}
 			}, start);
-
-	private static LayoutParams passwordPromptLayoutParameters = new LayoutParams(
-			LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
