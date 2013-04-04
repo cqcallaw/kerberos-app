@@ -236,7 +236,7 @@ public class KerberosActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_kinit);
+		setContentView(R.layout.activity_kerberos);
 
 		authenticateButton = (Button) findViewById(R.id.authentication);
 		cancelButton = (Button) findViewById(R.id.cancel);
