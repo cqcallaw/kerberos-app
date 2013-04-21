@@ -1,0 +1,3 @@
+[submodule "src/net/brainvitamins/kerberos/state-manager"]
+	path = src/net/brainvitamins/kerberos/state-manager
+	url = git@github.com:cqcallaw/state-manager.git
