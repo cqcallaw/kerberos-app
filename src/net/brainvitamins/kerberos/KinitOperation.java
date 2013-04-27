@@ -27,12 +27,6 @@ public class KinitOperation extends KerberosOperation {
 	public static KinitOperationNativeWrapper wrapper;
 
 	public synchronized static void execute(String principalName,
-			File configurationFile, Handler messageHandler) {
-		execute(principalName, Utilities.getDefaultCredentialsCache(),
-				configurationFile, messageHandler);
-	}
-
-	public synchronized static void execute(String principalName,
 			final CredentialsCacheFile credentialsCache,
 			final File configurationFile, final Handler messageHandler) {
 

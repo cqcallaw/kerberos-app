@@ -73,6 +73,7 @@ public class KerberosActivity extends Activity {
 	private KerberosCallbackArray callbackArray;
 
 	private static File localConfigurationFile;
+	private static CredentialsCacheFile credentialsCacheFile;
 
 	private static LayoutParams passwordPromptLayoutParameters = new LayoutParams(
 			LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -125,7 +126,7 @@ public class KerberosActivity extends Activity {
 					String principal = principalField.getText().toString();
 
 					Log.d("KerberosActivity", "Starting async kinit operation.");
-					KinitOperation.execute(principal, localConfigurationFile,
+					KinitOperation.execute(principal, credentialsCacheFile, localConfigurationFile,
 							messageHandler);
 				}
 			});
@@ -259,8 +260,8 @@ public class KerberosActivity extends Activity {
 		preferences = getPreferences(MODE_PRIVATE);
 		principalField.setText(preferences.getString(principalKey, ""));
 
-		localConfigurationFile = new File(getFilesDir() + File.separator
-				+ "krb5.conf");
+		localConfigurationFile = new File(getFilesDir(), "krb5.conf");
+		credentialsCacheFile = new CredentialsCacheFile(getFilesDir());
 
 		try {
 			Log.d(LOG_TAG, "Using configuration file: "
@@ -295,7 +296,7 @@ public class KerberosActivity extends Activity {
 			public void onClick(View v) {
 				clearView();
 
-				KlistOperation.execute(Utilities.getDefaultCredentialsCache(),
+				KlistOperation.execute(credentialsCacheFile,
 						localConfigurationFile, messageHandler);
 			}
 		});
@@ -305,8 +306,7 @@ public class KerberosActivity extends Activity {
 			public void onClick(View v) {
 				clearView();
 
-				KdestroyOperation.execute(
-						Utilities.getDefaultCredentialsCache(),
+				KdestroyOperation.execute(credentialsCacheFile,
 						localConfigurationFile, messageHandler);
 			}
 		});

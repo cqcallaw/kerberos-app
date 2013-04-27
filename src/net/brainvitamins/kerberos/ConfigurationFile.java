@@ -15,13 +15,17 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class Utilities {
-	public static CredentialsCacheFile getDefaultCredentialsCache() {
-		int uid = android.os.Process.myUid();
+import java.io.File;
 
-		CredentialsCacheFile credentialsCache = new CredentialsCacheFile(
-				"/data/local/kerberos/ccache/krb5cc_" + uid);
+public class ConfigurationFile extends File {
 
-		return credentialsCache;
+	private static final long serialVersionUID = 6962942252098175806L;
+
+	public ConfigurationFile(File baseDirectory) {
+		this(baseDirectory, "krb5.conf");
+	}
+
+	public ConfigurationFile(File baseDirectory, String name) {
+		super(baseDirectory, name);
 	}
 }

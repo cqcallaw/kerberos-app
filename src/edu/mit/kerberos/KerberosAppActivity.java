@@ -140,7 +140,7 @@ public class KerberosAppActivity extends Activity implements
 			};
 
 			Log.d("KerberosActivity", "Starting kinitAsync operation.");
-			KinitOperation.execute(principalField.getText().toString(), null,
+			KinitOperation.execute(principalField.getText().toString(), null, null,
 					logMessageHandler);
 		}
 	};

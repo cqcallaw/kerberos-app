@@ -47,8 +47,7 @@ public class ConfigurationActivity extends Activity {
 
 		setContentView(R.layout.activity_configuration);
 
-		localConfigurationFile = new File(getFilesDir() + File.separator
-				+ "krb5.conf");
+		localConfigurationFile = new ConfigurationFile(getFilesDir());
 
 		// make sure localConfigurationFile has a default contents
 		if (!localConfigurationFile.exists()) {

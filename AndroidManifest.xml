@@ -7,6 +7,8 @@
     <uses-sdk android:minSdkVersion="10" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <permission android:name="net.brainvitamins.kerberos.READ_CREDENTIALS_CACHE" />
 
     <application
         android:icon="@drawable/icon"
@@ -40,6 +42,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="net.brainvitamins.kerberos.KerberosProvider"
+            android:authorities="net.brainvitamins.kerberos.provider"
+            android:exported="true"
+            android:readPermission="net.brainvitamins.kerberos.READ_CREDENTIALS_CACHE" />
     </application>
 
 </manifest>

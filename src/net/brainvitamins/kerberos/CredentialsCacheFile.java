@@ -19,9 +19,13 @@ import java.io.File;
 
 public class CredentialsCacheFile extends File {
 
-	private static final long serialVersionUID = 6962942252098175806L;
+	private static final long serialVersionUID = -7250025998311907100L;
 
-	public CredentialsCacheFile(String path) {
-		super(path);
+	public CredentialsCacheFile(File baseDirectory) {
+		this(baseDirectory, "krb5cc_" + android.os.Process.myUid());
+	}
+
+	public CredentialsCacheFile(File baseDirectory, String name) {
+		super(baseDirectory, name);
 	}
 }
