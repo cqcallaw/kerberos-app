@@ -19,16 +19,10 @@ LOCAL_SRC_FILES := lib/libkrb5_db2.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 ## libgssrpc
-include $(CLEAR_VARS)
-LOCAL_MODULE := libgssrpc
-LOCAL_SRC_FILES := lib/libgssrpc.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-## libgssapi_krb5
-include $(CLEAR_VARS)
-LOCAL_MODULE := libgssapi_krb5
-LOCAL_SRC_FILES := lib/libgssapi_krb5.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := libgssrpc
+#LOCAL_SRC_FILES := lib/libgssrpc.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
 ## libkrb5
 include $(CLEAR_VARS)
@@ -54,13 +48,7 @@ LOCAL_MODULE := libkrb5support
 LOCAL_SRC_FILES := lib/libkrb5support.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-## libcyassl
-include $(CLEAR_VARS)
-LOCAL_MODULE := libcyassl
-LOCAL_SRC_FILES := lib/libcyassl.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-## Kerberos Test Application JNI Library (KerberosApp)
+## Kerberos interaction logic
 include $(CLEAR_VARS)
 
 LOCAL_MODULE     := libkerberosapp
@@ -75,7 +63,6 @@ LOCAL_SRC_FILES  := kerberosapp.c \
                     klist/klist.c \
                     kvno/kvno.c \
                     kdestroy/kdestroy.c \
-                    gsswrapper_wrap.c
 
 #LOCAL_CFLAGS     := -DHAVE_CONFIG_H -DNO_MAIN_DRIVER -DNDEBUG -DNO_HC128 -DNO_PSK -Wall -Wno-unused -DTHREAD_SAFE
 ## For additional shadow warnings, use -Wshadow -Wmissing-format-attribute
@@ -83,7 +70,6 @@ LOCAL_CFLAGS     := -DKRB5_DEPRECATED=1 -DKRB5_PRIVATE -DANDROID -fno-common -Wa
 LOCAL_LDLIBS     := -llog
 
 ##LOCAL_STATIC_LIBRARIES := libkrb5 libcom_err libkadm5srv libkdb5 libk5crypto libkrb5support
-LOCAL_STATIC_LIBRARIES := libkadm5srv_mit libkdb5 libkrb5_db2 libgssrpc libgssapi_krb5 libkrb5 libk5crypto libcom_err libkrb5support libcyassl
+LOCAL_STATIC_LIBRARIES := libkadm5srv_mit libkdb5 libkrb5_db2 krb5 libkrb5 libk5crypto libcom_err libkrb5support
 
 include $(BUILD_SHARED_LIBRARY)
-
