@@ -96,9 +96,9 @@ public abstract class KerberosOperation {
 			public void run() {
 				if (operationLock.tryLock()) {
 					try {
-						wrapper.nativeSetEnv("KRB5_CONFIG", configurationFile
+						wrapper.setEnv("KRB5_CONFIG", configurationFile
 								.getCanonicalPath().toString());
-						wrapper.nativeSetEnv("KRB5CCNAME", credentialsCache
+						wrapper.setEnv("KRB5CCNAME", credentialsCache
 								.getCanonicalPath().toString());
 
 						Log.d(LOG_TAG, "Going native...");

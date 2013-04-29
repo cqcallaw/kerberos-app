@@ -19,7 +19,7 @@ import android.os.Message;
 class KinitOperationNativeWrapper extends KerberosOperationNativeWrapper
 		implements KerberosCallbackArraySource {
 
-	public native int nativeKinit(String argv, int argc);
+	public native int kinit(String argv, int argc);
 
 	boolean callbacksProcessed = false;
 
@@ -57,6 +57,6 @@ class KinitOperationNativeWrapper extends KerberosOperationNativeWrapper
 
 	@Override
 	public int executeNativeOperation(String arguments, int argumentCount) {
-		return nativeKinit(arguments, argumentCount);
+		return kinit(arguments, argumentCount);
 	}
 }

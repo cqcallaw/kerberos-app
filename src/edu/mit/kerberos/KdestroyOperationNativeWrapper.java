@@ -11,7 +11,7 @@ import android.os.Handler;
  */
 class KdestroyOperationNativeWrapper extends KerberosOperationNativeWrapper {
 
-	public native int nativeKdestroy(String argv, int argc);
+	public native int kdestroy(String argv, int argc);
 
 	public KdestroyOperationNativeWrapper(Handler messageHandler) {
 		super(messageHandler);
@@ -19,6 +19,6 @@ class KdestroyOperationNativeWrapper extends KerberosOperationNativeWrapper {
 
 	@Override
 	public int executeNativeOperation(String arguments, int argumentCount) {
-		return nativeKdestroy(arguments, argumentCount);
+		return kdestroy(arguments, argumentCount);
 	}
 }

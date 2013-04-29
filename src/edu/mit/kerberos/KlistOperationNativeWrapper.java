@@ -11,7 +11,7 @@ import android.os.Handler;
  */
 class KlistOperationNativeWrapper extends KerberosOperationNativeWrapper {
 
-	public native int nativeKlist(String argv, int argc);
+	public native int klist(String argv, int argc);
 
 	public KlistOperationNativeWrapper(Handler messageHandler) {
 		super(messageHandler);
@@ -19,6 +19,6 @@ class KlistOperationNativeWrapper extends KerberosOperationNativeWrapper {
 
 	@Override
 	public int executeNativeOperation(String arguments, int argumentCount) {
-		return nativeKlist(arguments, argumentCount);
+		return klist(arguments, argumentCount);
 	}
 }

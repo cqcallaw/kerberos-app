@@ -174,7 +174,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
  * Set an environment variable (e.g. KRB5CCNAME)
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosOperationNativeWrapper_nativeSetEnv(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosOperationNativeWrapper_setEnv(
         JNIEnv* env, jobject obj, jstring variable_name, jstring value)
 {
     jboolean isCopy;
@@ -205,7 +205,7 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosOperationNativeWrapper_nati
  * Wrapper around native kinit application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KinitOperationNativeWrapper_nativeKinit(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KinitOperationNativeWrapper_kinit(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -270,7 +270,7 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KinitOperationNativeWrapper_nativeK
  * Wrapper around native klist application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KlistOperationNativeWrapper_nativeKlist(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KlistOperationNativeWrapper_klist(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -318,7 +318,7 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KlistOperationNativeWrapper_nativeK
  * Wrapper around native kvno application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KvnoOperationNativeWrapper_nativeKvno(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KvnoOperationNativeWrapper_kvno(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -366,7 +366,7 @@ JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KvnoOperationNativeWrapper_nativeKv
  * Wrapper around native kdestroy application
  *
  */
-JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KdestroyOperationNativeWrapper_nativeKdestroy(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KdestroyOperationNativeWrapper_kdestroy(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;

@@ -11,7 +11,7 @@ import android.os.Handler;
  */
 class KvnoOperationNativeWrapper extends KerberosOperationNativeWrapper {
 
-	public native int nativeKvno(String argv, int argc);
+	public native int kvno(String argv, int argc);
 
 	public KvnoOperationNativeWrapper(Handler messageHandler) {
 		super(messageHandler);
@@ -19,6 +19,6 @@ class KvnoOperationNativeWrapper extends KerberosOperationNativeWrapper {
 
 	@Override
 	public int executeNativeOperation(String arguments, int argumentCount) {
-		return nativeKvno(arguments, argumentCount);
+		return kvno(arguments, argumentCount);
 	}
 }
