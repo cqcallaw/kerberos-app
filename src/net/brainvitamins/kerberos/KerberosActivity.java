@@ -46,6 +46,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import edu.mit.kerberos.CredentialsCacheFile;
+import edu.mit.kerberos.KdestroyOperation;
+import edu.mit.kerberos.KerberosCallbackArray;
+import edu.mit.kerberos.KerberosOperation;
+import edu.mit.kerberos.KinitOperation;
+import edu.mit.kerberos.KlistOperation;
 import edu.mit.kerberos.R;
 
 public class KerberosActivity extends Activity {

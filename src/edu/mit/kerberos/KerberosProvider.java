@@ -1,4 +1,4 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +14,7 @@ public class KerberosProvider extends ContentProvider {
 	// https://github.com/commonsguy/cw-advandroid/tree/master/ContentProvider/Files/src/com/commonsware/android/cp/files
 
 	public static final Uri CONTENT_URI = Uri
-			.parse("content://net.brainvitamins.kerberos.provider/credentials_cache");
+			.parse("content://edu.mit.kerberos.provider/credentials_cache");
 
 	@Override
 	public int delete(Uri arg0, String arg1, String[] arg2) {

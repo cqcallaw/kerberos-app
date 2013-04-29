@@ -1,4 +1,4 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,11 @@ package net.brainvitamins.kerberos;
 
 import java.io.File;
 
-public class CredentialsCacheFile extends File {
+public class KeytabFile extends File {
 
-	private static final long serialVersionUID = -7250025998311907100L;
+	private static final long serialVersionUID = 2436315733362502786L;
 
-	public CredentialsCacheFile(File baseDirectory) {
-		this(baseDirectory, "krb5cc_" + android.os.Process.myUid());
-	}
-
-	public CredentialsCacheFile(File baseDirectory, String name) {
-		super(baseDirectory, name);
+	public KeytabFile(String path) {
+		super(path);
 	}
 }

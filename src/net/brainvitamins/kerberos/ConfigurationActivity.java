@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import edu.mit.kerberos.ConfigurationFile;
 import edu.mit.kerberos.R;
 
 public class ConfigurationActivity extends Activity {

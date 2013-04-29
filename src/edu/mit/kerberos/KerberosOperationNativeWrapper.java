@@ -1,6 +1,6 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
-import net.brainvitamins.kerberos.KerberosOperation;
+import edu.mit.kerberos.KerberosOperation;
 import android.os.Handler;
 
 public abstract class KerberosOperationNativeWrapper {

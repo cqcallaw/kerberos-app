@@ -1,4 +1,4 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 /*
  This program is free software: you can redistribute it and/or modify

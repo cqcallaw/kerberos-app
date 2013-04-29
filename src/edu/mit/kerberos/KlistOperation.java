@@ -1,4 +1,9 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
+
+import java.io.File;
+
+
+import android.os.Handler;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -15,13 +20,15 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
+public class KlistOperation extends KerberosOperation {
 
-public class KeytabFile extends File {
+	public static final String LOG_TAG = "KlistOperation";
 
-	private static final long serialVersionUID = 2436315733362502786L;
+	public synchronized static void execute(
+			final CredentialsCacheFile credentialsCache,
+			final File configurationFile, final Handler messageHandler) {
 
-	public KeytabFile(String path) {
-		super(path);
+		execute("", new KlistOperationNativeWrapper(messageHandler),
+				credentialsCache, configurationFile);
 	}
 }

@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "net_brainvitamins_kerberos_KerberosOperations.h"
+#include "edu_mit_kerberos_KerberosOperations.h"
 #include "kerberosapp.h"
 
 /* Global JNI Variables */
@@ -167,14 +167,14 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved)
 }
 
 /*
- * Class:     net_brainvitamins_kerberos_KerberosOperations
+ * Class:     edu_mit_kerberos_KerberosOperations
  * Method:    nativeSetKRB5CCNAME
  * Signature: (Ljava/lang/String)I
  *
  * Set an environment variable (e.g. KRB5CCNAME)
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperationNativeWrapper_nativeSetEnv(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KerberosOperationNativeWrapper_nativeSetEnv(
         JNIEnv* env, jobject obj, jstring variable_name, jstring value)
 {
     jboolean isCopy;
@@ -198,14 +198,14 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KerberosOperationNativeWr
 }
 
 /*
- * Class:     net_brainvitamins_kerberos_KerberosOperations
+ * Class:     edu_mit_kerberos_KerberosOperations
  * Method:    nativeKinit
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native kinit application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapper_nativeKinit(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KinitOperationNativeWrapper_nativeKinit(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -263,14 +263,14 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KinitOperationNativeWrapp
 }
 
 /*
- * Class:     net_brainvitamins_kerberos_KerberosOperations
+ * Class:     edu_mit_kerberos_KerberosOperations
  * Method:    nativeKlist
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native klist application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KlistOperationNativeWrapper_nativeKlist(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KlistOperationNativeWrapper_nativeKlist(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -311,14 +311,14 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KlistOperationNativeWrapp
 }
 
 /*
- * Class:     net_brainvitamins_kerberos_KerberosOperations
+ * Class:     edu_mit_kerberos_KerberosOperations
  * Method:    nativeKvno
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native kvno application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KvnoOperationNativeWrapper_nativeKvno(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KvnoOperationNativeWrapper_nativeKvno(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;
@@ -359,14 +359,14 @@ JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KvnoOperationNativeWrappe
 }
 
 /*
- * Class:     net_brainvitamins_kerberos_KerberosOperations
+ * Class:     edu_mit_kerberos_KerberosOperations
  * Method:    nativeKdestroy
  * Signature: (Ljava/lang/String;I)I
  *
  * Wrapper around native kdestroy application
  *
  */
-JNIEXPORT jint JNICALL Java_net_brainvitamins_kerberos_KdestroyOperationNativeWrapper_nativeKdestroy(
+JNIEXPORT jint JNICALL Java_edu_mit_kerberos_KdestroyOperationNativeWrapper_nativeKdestroy(
         JNIEnv* env, jobject obj, jstring argString, jint argCount)
 {
     jboolean isCopy;

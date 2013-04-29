@@ -1,8 +1,4 @@
-package net.brainvitamins.kerberos;
-
-import java.io.File;
-
-import android.os.Handler;
+package edu.mit.kerberos;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -19,15 +15,17 @@ import android.os.Handler;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class KvnoOperation extends KerberosOperation {
+import java.io.File;
 
-	public static final String LOG_TAG = "KlistOperation";
+public class ConfigurationFile extends File {
 
-	public synchronized static void execute(
-			final CredentialsCacheFile credentialsCache,
-			final File configurationFile, final Handler messageHandler) {
+	private static final long serialVersionUID = 6962942252098175806L;
 
-		execute("", new KvnoOperationNativeWrapper(messageHandler),
-				credentialsCache, configurationFile);
+	public ConfigurationFile(File baseDirectory) {
+		this(baseDirectory, "krb5.conf");
+	}
+
+	public ConfigurationFile(File baseDirectory, String name) {
+		super(baseDirectory, name);
 	}
 }

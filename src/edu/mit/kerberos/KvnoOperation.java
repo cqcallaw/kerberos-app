@@ -1,4 +1,9 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
+
+import java.io.File;
+
+
+import android.os.Handler;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -15,6 +20,15 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public interface KerberosCallbackArraySource {
-	void signalCallbackProcessFinished();
+public class KvnoOperation extends KerberosOperation {
+
+	public static final String LOG_TAG = "KlistOperation";
+
+	public synchronized static void execute(
+			final CredentialsCacheFile credentialsCache,
+			final File configurationFile, final Handler messageHandler) {
+
+		execute("", new KvnoOperationNativeWrapper(messageHandler),
+				credentialsCache, configurationFile);
+	}
 }

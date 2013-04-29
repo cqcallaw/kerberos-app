@@ -1,8 +1,4 @@
-package net.brainvitamins.kerberos;
-
-import java.io.File;
-
-import android.os.Handler;
+package edu.mit.kerberos;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -19,15 +15,17 @@ import android.os.Handler;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class KdestroyOperation extends KerberosOperation {
+import java.io.File;
 
-	public static final String LOG_TAG = "KlistOperation";
+public class CredentialsCacheFile extends File {
 
-	public synchronized static void execute(
-			final CredentialsCacheFile credentialsCache,
-			final File configurationFile, final Handler messageHandler) {
+	private static final long serialVersionUID = -7250025998311907100L;
 
-		execute("", new KdestroyOperationNativeWrapper(messageHandler),
-				credentialsCache, configurationFile);
+	public CredentialsCacheFile(File baseDirectory) {
+		this(baseDirectory, "krb5cc_" + android.os.Process.myUid());
+	}
+
+	public CredentialsCacheFile(File baseDirectory, String name) {
+		super(baseDirectory, name);
 	}
 }

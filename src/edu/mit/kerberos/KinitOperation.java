@@ -1,4 +1,4 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@ package net.brainvitamins.kerberos;
  */
 
 import java.io.File;
+
 
 import android.os.Handler;
 import android.util.Log;

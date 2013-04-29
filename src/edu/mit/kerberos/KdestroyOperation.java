@@ -1,4 +1,4 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ import android.os.Handler;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class KlistOperation extends KerberosOperation {
+public class KdestroyOperation extends KerberosOperation {
 
 	public static final String LOG_TAG = "KlistOperation";
 
@@ -27,7 +27,7 @@ public class KlistOperation extends KerberosOperation {
 			final CredentialsCacheFile credentialsCache,
 			final File configurationFile, final Handler messageHandler) {
 
-		execute("", new KlistOperationNativeWrapper(messageHandler),
+		execute("", new KdestroyOperationNativeWrapper(messageHandler),
 				credentialsCache, configurationFile);
 	}
 }

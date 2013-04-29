@@ -1,9 +1,10 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 import java.io.IOException;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
 
 import android.os.Handler;
 import android.os.Message;

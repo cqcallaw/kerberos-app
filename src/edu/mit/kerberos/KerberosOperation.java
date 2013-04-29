@@ -1,4 +1,4 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import edu.mit.kerberos.KerberosOperations;
 
 import android.os.Handler;
 import android.os.Message;
@@ -105,8 +103,7 @@ public abstract class KerberosOperation {
 
 						Log.d(LOG_TAG, "Going native...");
 						int listResult = wrapper.executeNativeOperation(
-								operationArguments, KerberosOperations
-										.countWords(operationArguments));
+								operationArguments, countWords(operationArguments));
 
 						Log.d(LOG_TAG, "Native return code: " + listResult);
 						if (listResult == SUCCESS_MESSAGE
@@ -133,6 +130,11 @@ public abstract class KerberosOperation {
 					Log.e(LOG_TAG,
 							"Attempted to launch multiple concurrent native operations.");
 				}
+			}
+
+			private int countWords(String subject) {
+				//ref: http://stackoverflow.com/a/8924691/577298
+				return subject.isEmpty() ? 0 : subject.split("\\s+").length;
 			}
 		};
 

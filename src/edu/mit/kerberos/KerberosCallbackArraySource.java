@@ -1,4 +1,4 @@
-package net.brainvitamins.kerberos;
+package edu.mit.kerberos;
 
 /*
  This program is free software: you can redistribute it and/or modify
@@ -15,17 +15,6 @@ package net.brainvitamins.kerberos;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
-
-public class ConfigurationFile extends File {
-
-	private static final long serialVersionUID = 6962942252098175806L;
-
-	public ConfigurationFile(File baseDirectory) {
-		this(baseDirectory, "krb5.conf");
-	}
-
-	public ConfigurationFile(File baseDirectory, String name) {
-		super(baseDirectory, name);
-	}
+public interface KerberosCallbackArraySource {
+	void signalCallbackProcessFinished();
 }
