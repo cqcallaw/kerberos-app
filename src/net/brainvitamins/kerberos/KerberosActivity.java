@@ -260,8 +260,6 @@ public class KerberosActivity extends Activity {
 		// TODO: investigate the possibility of replacing krb5.conf or
 		// generating it from Android settings
 		// -flex/bison?
-		// TODO: share credentials between apps:
-		// http://developer.android.com/guide/topics/providers/content-providers.html
 
 		preferences = getPreferences(MODE_PRIVATE);
 		principalField.setText(preferences.getString(principalKey, ""));
