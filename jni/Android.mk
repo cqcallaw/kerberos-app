@@ -60,7 +60,7 @@ LOCAL_MODULE := libcyassl
 LOCAL_SRC_FILES := lib/libcyassl.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-## Kerberos Test Application JNI Library (KerberosApp)
+## Kerberos operations
 include $(CLEAR_VARS)
 
 LOCAL_MODULE     := libkerberosapp
@@ -75,7 +75,6 @@ LOCAL_SRC_FILES  := kerberosapp.c \
                     klist/klist.c \
                     kvno/kvno.c \
                     kdestroy/kdestroy.c \
-                    gsswrapper_wrap.c
 
 #LOCAL_CFLAGS     := -DHAVE_CONFIG_H -DNO_MAIN_DRIVER -DNDEBUG -DNO_HC128 -DNO_PSK -Wall -Wno-unused -DTHREAD_SAFE
 ## For additional shadow warnings, use -Wshadow -Wmissing-format-attribute
