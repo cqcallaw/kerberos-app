@@ -4,7 +4,7 @@ import edu.mit.kerberos.KerberosOperation;
 import android.os.Handler;
 
 public abstract class KerberosOperationNativeWrapper {
-	public native int setEnv(String variableName, String value);
+	protected native int setEnv(String variableName, String value);
 
 	protected final Handler messageHandler;
 
