@@ -1,10 +1,15 @@
 
-Kerberos Android Sample Application
+Kerberos Android Application
 
-This is a sample Android NDK application which acts as a simple GUI wrapper
+This is an Android NDK application which acts as a simple GUI wrapper
 around the MIT Kerberos kinit, klist, kvno, and kdestroy client 
 applications. It is derived from the Android Kerberos sample app available
 from https://github.com/cconlon/kerberos-android-ndk
+
+This app is designed to provide an Androi GUI for to the common
+Kerberos operations (kinit, klist, et cetera), and make the Kerberos 
+credentials cache available for use by other apps. The credentials cache 
+is exposed to the rest of the system via the included content provider.
 
 This package includes cross-compiled versions of the MIT Kerberos
 libraries as well as the CyaSSL Embedded SSL Library. It should be 
