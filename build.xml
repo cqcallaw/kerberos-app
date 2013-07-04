@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project
-    name="KerberosAppActivity"
+    name="KerberosApp"
     default="help" >
 
     <!--
@@ -110,22 +110,6 @@
 
     <target name="-post-compile" >
 
-        <javah
-            classpath="${out.dir}/classes"
-            outputFile="jni/edu_mit_kerberos_KerberosOperations.h"
-            verbose="yes" >
-
-            <class name="edu.mit.kerberos.KerberosOperationNativeWrapper" />
-
-            <class name="edu.mit.kerberos.KinitOperationNativeWrapper" />
-
-            <class name="edu.mit.kerberos.KlistOperationNativeWrapper" />
-
-            <class name="edu.mit.kerberos.KdestroyOperationNativeWrapper" />
-
-            <class name="edu.mit.kerberos.KvnoOperationNativeWrapper" />
-        </javah>
-
         <!-- ref: http://stackoverflow.com/a/7611201/577298 -->
 
         <exec
@@ -134,8 +118,7 @@
     </target>
 
     <target
-        name="clean"
-        depends="android_rules.clean" >
+        name="-pre-clean" >
 
         <exec
             executable="${ndk.dir}/ndk-build"
@@ -144,7 +127,6 @@
             <arg value="clean" />
         </exec>
 
-        <delete file="jni/edu_mit_kerberos_KerberosOperations.h" />
     </target>
 
     <import file="${sdk.dir}/tools/ant/build.xml" />
