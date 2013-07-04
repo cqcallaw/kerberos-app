@@ -65,11 +65,11 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE     := libkerberosapp
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
-                    ../kerberos-library/jni/ \
-                    ../kerberos-library/jni/include \
-                    ../kerberos-library/jni/kinit \
-                    ../kerberos-library/jni/kinit/include \
-                    ../kerberos-library/jni/klist/include
+                    $(LOCAL_PATH)/../kerberos-library/jni/ \
+                    $(LOCAL_PATH)/../kerberos-library/jni/include \
+                    $(LOCAL_PATH)/../kerberos-library/jni/kinit \
+                    $(LOCAL_PATH)/../kerberos-library/jni/kinit/include \
+                    $(LOCAL_PATH)/../kerberos-library/jni/klist/include
 LOCAL_SRC_FILES  := ../kerberos-library/jni/kerberosapp.c \
                     ../kerberos-library/jni/kinit/kinit.c \
                     ../kerberos-library/jni/kinit/kinit_kdb.c \
