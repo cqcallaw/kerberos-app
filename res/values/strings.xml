@@ -3,7 +3,7 @@
 
     <string name="app_name">Kerberos</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_kinit">Kinit</string>
+    <string name="title_activity_kerberos">Kerberos</string>
     <string name="principal_hint">principal</string>
     <string name="label_start_authentication">Begin</string>
     <string name="label_initializing_authentication">Contacting KDC…</string>

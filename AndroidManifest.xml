@@ -26,7 +26,7 @@
         <!-- </activity> -->
         <activity
             android:name="net.brainvitamins.kerberos.KerberosActivity"
-            android:label="@string/title_activity_kinit" >
+            android:label="@string/title_activity_kerberos" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
