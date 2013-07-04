@@ -1,11 +1,10 @@
 
-Kerberos Android NDK Sample Application
+Kerberos Android Sample Application
 
 This is a sample Android NDK application which acts as a simple GUI wrapper
 around the MIT Kerberos kinit, klist, kvno, and kdestroy client 
-applications as well as provides a sample client which uses the Java 
-GSS-API interface. The GSS-API interface is a Java wrapper for the existing 
-Kerberos GSS-API C-bindings and was created using SWIG. 
+applications. It is derived from the Android Kerberos sample app available
+from https://github.com/cconlon/kerberos-android-ndk
 
 This package includes cross-compiled versions of the MIT Kerberos
 libraries as well as the CyaSSL Embedded SSL Library. It should be 
@@ -16,9 +15,6 @@ Applications.
 By default, this package uses pre-built static Kerberos and CyaSSL 
 libraries which are needed in order to be linked to the KerberosApp 
 application's native library (libkerberosapp.so).
-
-For detailed information on the Java GSS-API interface, please see the
-GSSAPI_README file included in this project's root directory.
 
 ===========================================================================
 REQUIREMENTS:
@@ -37,16 +33,23 @@ https://developer.android.com/guide/developing/tools/emulator.html
 ===========================================================================
 BUILDING:
 
-To build and install this package, including Java GSS-API bindings, run
-the following commands. If you would like to use the GSS-API example
-client, please update your client and server settings in
-./src/edu/mit/kerberos/KerberosAppActivity.java before building the project.
+To build and install this package:
 
-android update project -p . -s
-swig -java -package edu.mit.kerberos -outdir ./src/edu/mit/kerberos
-     -o ./jni/gsswrapper_wrap.c ./jni/gsswrapper.i
-ndk-build
-ant debug
+1) Update the Android project:
+
+	android update project -p . -s
+	
+2) Configure the NDK by setting the ndk.dir environment variable in 
+local.properties
+
+3) Initialize submodules:
+
+	git submodule init
+	git submodule update
+	
+4) Compile:
+
+	ant debug
 
 If you want to rebuild the pre-built Kerberos libraries, please use the
 android-config.sh shell script. This will allow the MIT Kerberos libraries
