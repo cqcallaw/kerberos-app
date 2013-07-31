@@ -18,8 +18,8 @@ Kerberos libraries or the GSS-API interface in their own Android NDK
 Applications.
 
 By default, this package uses pre-built static Kerberos and CyaSSL 
-libraries which are needed in order to be linked to the KerberosApp 
-application's native library (libkerberosapp.so).
+libraries which are needed in order to be linked to the Kerberos app's 
+native library (libkerberos.so).
 
 ===========================================================================
 REQUIREMENTS:
